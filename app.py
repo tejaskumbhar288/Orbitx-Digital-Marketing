@@ -9,6 +9,9 @@ import logging
 from dotenv import load_dotenv
 import urllib.parse
 import webbrowser
+import asyncio
+import openai
+from twilio.rest import Client
 
 # Load environment variables
 load_dotenv()
@@ -36,6 +39,135 @@ app.config['MAX_CONTENT_LENGTH'] = int(os.environ.get('MAX_CONTENT_LENGTH', 16 *
 # Initialize extensions
 db.init_app(app)
 mail = Mail(app)
+
+# Initialize OpenAI client
+openai_client = None
+if os.getenv('OPENAI_API_KEY'):
+    openai_client = openai.AsyncOpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
+# Initialize Twilio client
+twilio_client = None
+if os.getenv('TWILIO_ACCOUNT_SID') and os.getenv('TWILIO_AUTH_TOKEN'):
+    twilio_client = Client(os.getenv('TWILIO_ACCOUNT_SID'), os.getenv('TWILIO_AUTH_TOKEN'))
+
+# AI Analysis Functions
+async def analyze_quote_with_ai(quote_data):
+    """Analyze quote with OpenAI for priority and value estimation"""
+    if not openai_client:
+        return {"priority": 5, "estimated_value": "Rs 5,000-15,000", "strategy": "Standard response"}
+
+    try:
+        prompt = f"""Analyze this design quote briefly:
+        Client: {quote_data.get('client_name')}
+        Service: {quote_data.get('services_requested')}
+        Budget: {quote_data.get('budget_range', 'Not specified')}
+        Description: {quote_data.get('project_description', '')[:200]}
+
+        Provide priority (1-10) and estimated value in rupees in this format:
+        Priority: X/10
+        Value: Rs X,XXX-X,XXX"""
+
+        response = await openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=100
+        )
+
+        result = response.choices[0].message.content
+
+        # Extract priority and value
+        priority = 5
+        value = "Rs 5,000-15,000"
+
+        lines = result.split('\n')
+        for line in lines:
+            if 'Priority:' in line or 'priority:' in line.lower():
+                try:
+                    priority = int(line.split(':')[1].split('/')[0].strip())
+                except:
+                    pass
+            if 'Value:' in line or 'value:' in line.lower():
+                try:
+                    value = line.split(':')[1].strip()
+                except:
+                    pass
+
+        return {
+            "priority": priority,
+            "estimated_value": value,
+            "strategy": "AI-analyzed response"
+        }
+
+    except Exception as e:
+        app.logger.error(f"AI analysis error: {e}")
+        return {"priority": 5, "estimated_value": "Rs 5,000-15,000", "strategy": "Standard response"}
+
+async def generate_ai_enhanced_whatsapp_message(quote_data, analysis):
+    """Generate enhanced WhatsApp message with AI insights"""
+
+    priority_emoji = "🔥" if analysis['priority'] >= 8 else "⭐" if analysis['priority'] >= 6 else "📝"
+
+    message = f"""{priority_emoji} NEW QUOTE REQUEST - OrbitX
+
+👤 Client: {quote_data.get('client_name')}
+📧 Email: {quote_data.get('email')}
+📱 Phone: {quote_data.get('phone', 'Not provided')}
+🏢 Company: {quote_data.get('company_name', 'Not provided')}
+
+🛠️ Service: {quote_data.get('services_requested')}
+💰 Budget: {quote_data.get('budget_range', 'Not specified')}
+⏰ Timeline: {quote_data.get('timeline', 'Not specified')}
+
+📝 Project Description:
+{quote_data.get('project_description', '')}
+
+🤖 AI Analysis:
+• Priority: {analysis['priority']}/10
+• Est. Value: {analysis['estimated_value']}
+• Strategy: {analysis['strategy']}
+
+⚡ Action Required: Prepare and send detailed quote to {quote_data.get('email')}"""
+
+    return message
+
+def send_sms_notification(quote_data, analysis):
+    """Send SMS notification via Twilio"""
+    if not twilio_client:
+        app.logger.warning("Twilio not configured - SMS notification skipped")
+        return False
+
+    try:
+        # Generate concise SMS message
+        priority_text = "HIGH PRIORITY" if analysis['priority'] >= 8 else "MEDIUM" if analysis['priority'] >= 6 else "STANDARD"
+
+        message = f"""NEW QUOTE - OrbitX ({priority_text})
+
+Client: {quote_data.get('client_name')}
+Email: {quote_data.get('email')}
+Service: {quote_data.get('services_requested')}
+Budget: {quote_data.get('budget_range', 'Not specified')}
+
+AI Analysis:
+Priority: {analysis['priority']}/10
+Est. Value: {analysis['estimated_value']}
+
+Description: {quote_data.get('project_description', '')[:100]}...
+
+Action: Send quote to {quote_data.get('email')}"""
+
+        # Send SMS
+        sms = twilio_client.messages.create(
+            body=message,
+            from_=os.getenv('TWILIO_PHONE_NUMBER'),
+            to=os.getenv('TARGET_PHONE_NUMBER')
+        )
+
+        app.logger.info(f"SMS sent successfully - SID: {sms.sid}, Status: {sms.status}")
+        return True
+
+    except Exception as e:
+        app.logger.error(f"Failed to send SMS: {e}")
+        return False
 
 # Routes
 @app.route('/')
@@ -160,18 +292,18 @@ def quote():
     """Quote request page"""
     form = QuoteForm()
 
-    if form.validate_on_submit():
-        # Create quote request
+    if request.method == 'POST':
+        # Create quote request from raw form data
         quote_request = QuoteRequest(
-            client_name=form.client_name.data,
-            email=form.email.data,
-            phone=form.phone.data,
-            company_name=form.company_name.data,
-            services_requested=form.services_requested.data,
-            project_description=form.project_description.data,
-            budget_range=form.budget_range.data,
-            timeline=form.timeline.data,
-            additional_requirements=form.additional_requirements.data,
+            client_name=request.form.get('client_name'),
+            email=request.form.get('email'),
+            phone=request.form.get('phone'),
+            company_name=request.form.get('company_name'),
+            services_requested=request.form.get('services_requested'),
+            project_description=request.form.get('project_description'),
+            budget_range=request.form.get('budget_range'),
+            timeline=request.form.get('timeline'),
+            additional_requirements=request.form.get('additional_requirements'),
             status='pending'
         )
 
@@ -179,36 +311,53 @@ def quote():
             db.session.add(quote_request)
             db.session.commit()
 
-            # Send WhatsApp notification
+            # Send AI-enhanced WhatsApp notification
             try:
-                # Prepare WhatsApp message
-                whatsapp_message = f"""🎯 NEW QUOTE REQUEST - OrbitX
+                # Prepare quote data for AI analysis
+                quote_data = {
+                    'client_name': quote_request.client_name,
+                    'email': quote_request.email,
+                    'phone': quote_request.phone,
+                    'company_name': quote_request.company_name,
+                    'services_requested': quote_request.services_requested,
+                    'project_description': quote_request.project_description,
+                    'budget_range': quote_request.budget_range,
+                    'timeline': quote_request.timeline,
+                    'additional_requirements': quote_request.additional_requirements
+                }
 
-👤 Client: {quote_request.client_name}
-📧 Email: {quote_request.email}
-📱 Phone: {quote_request.phone or 'Not provided'}
-🏢 Company: {quote_request.company_name or 'Not provided'}
+                # Run AI analysis and generate enhanced message
+                def run_ai_analysis():
+                    try:
+                        # Analyze quote with AI
+                        analysis = asyncio.run(analyze_quote_with_ai(quote_data))
 
-🛠️ Service: {quote_request.services_requested}
-💰 Budget: {quote_request.budget_range or 'Not specified'}
-⏰ Timeline: {quote_request.timeline or 'Not specified'}
+                        # Generate AI-enhanced message
+                        ai_message = asyncio.run(generate_ai_enhanced_whatsapp_message(quote_data, analysis))
 
-📝 Project Description:
-{quote_request.project_description}
+                        # URL encode the message for WhatsApp
+                        encoded_message = urllib.parse.quote(ai_message)
+                        whatsapp_url = f"https://wa.me/{os.getenv('TARGET_WHATSAPP_NUMBER', '919518536672')}?text={encoded_message}"
 
-📋 Additional Requirements:
-{quote_request.additional_requirements or 'None specified'}
+                        # Open WhatsApp Web
+                        webbrowser.open(whatsapp_url)
 
-⚡ Action Required: Prepare and send detailed quote to {quote_request.email}"""
+                        app.logger.info(f"AI-enhanced WhatsApp URL opened for {quote_request.client_name} - Priority: {analysis['priority']}/10")
 
-                # URL encode the message for WhatsApp
-                encoded_message = urllib.parse.quote(whatsapp_message)
-                whatsapp_url = f"https://wa.me/919518536672?text={encoded_message}"
+                    except Exception as e:
+                        app.logger.error(f"AI analysis failed: {e}")
+                        # Fallback to basic message
+                        basic_message = f"NEW QUOTE REQUEST - OrbitX\nClient: {quote_request.client_name}\nEmail: {quote_request.email}\nService: {quote_request.services_requested}"
+                        encoded_message = urllib.parse.quote(basic_message)
+                        whatsapp_url = f"https://wa.me/{os.getenv('TARGET_WHATSAPP_NUMBER', '919518536672')}?text={encoded_message}"
+                        webbrowser.open(whatsapp_url)
 
-                app.logger.info(f"WhatsApp URL generated for quote request from {quote_request.client_name}")
+                # Run AI analysis in background thread
+                from threading import Thread
+                Thread(target=run_ai_analysis, daemon=True).start()
 
             except Exception as e:
-                app.logger.error(f"Failed to generate WhatsApp URL: {e}")
+                app.logger.error(f"Failed to process AI-enhanced WhatsApp: {e}")
 
             flash('Thank you! We\'ve received your quote request. Our team will contact you within 2 hours via WhatsApp/Email with a detailed proposal.', 'success')
             return redirect(url_for('quote'))
@@ -219,6 +368,92 @@ def quote():
             flash('Sorry, there was an error submitting your request. Please try again.', 'error')
 
     return render_template('quote.html', form=form)
+
+@app.route('/quote-simple')
+def simple_quote():
+    """Simple quote form without complex validation"""
+    return render_template('simple_quote.html')
+
+@app.route('/quote/simple', methods=['POST'])
+def simple_quote_submission():
+    """Simple quote submission endpoint for direct testing"""
+    try:
+        # Create quote request from JSON or form data
+        if request.is_json:
+            data = request.get_json()
+        else:
+            data = request.form
+
+        quote_request = QuoteRequest(
+            client_name=data.get('client_name'),
+            email=data.get('email'),
+            phone=data.get('phone'),
+            company_name=data.get('company_name'),
+            services_requested=data.get('services_requested'),
+            project_description=data.get('project_description'),
+            budget_range=data.get('budget_range'),
+            timeline=data.get('timeline'),
+            additional_requirements=data.get('additional_requirements'),
+            status='pending'
+        )
+
+        db.session.add(quote_request)
+        db.session.commit()
+
+        # Process with AI-enhanced messaging
+        quote_data = {
+            'client_name': quote_request.client_name,
+            'email': quote_request.email,
+            'phone': quote_request.phone,
+            'company_name': quote_request.company_name,
+            'services_requested': quote_request.services_requested,
+            'project_description': quote_request.project_description,
+            'budget_range': quote_request.budget_range,
+            'timeline': quote_request.timeline,
+            'additional_requirements': quote_request.additional_requirements
+        }
+
+        # Background AI processing with SMS
+        def process_quote():
+            try:
+                # AI analysis
+                analysis = asyncio.run(analyze_quote_with_ai(quote_data))
+
+                # Send SMS notification
+                sms_sent = send_sms_notification(quote_data, analysis)
+
+                if sms_sent:
+                    app.logger.info(f"SMS quote notification sent for {quote_request.client_name} - Priority: {analysis['priority']}/10")
+                else:
+                    app.logger.warning(f"SMS failed for {quote_request.client_name} - using fallback")
+                    # Fallback to WhatsApp if SMS fails
+                    ai_message = asyncio.run(generate_ai_enhanced_whatsapp_message(quote_data, analysis))
+                    import urllib.parse
+                    encoded_message = urllib.parse.quote(ai_message)
+                    whatsapp_url = f"https://wa.me/{os.getenv('TARGET_WHATSAPP_NUMBER', '919518536672')}?text={encoded_message}"
+                    import webbrowser
+                    webbrowser.open(whatsapp_url)
+                    app.logger.info(f"WhatsApp fallback used for {quote_request.client_name}")
+
+            except Exception as e:
+                app.logger.error(f"Quote processing failed: {e}")
+
+        from threading import Thread
+        Thread(target=process_quote, daemon=True).start()
+
+        return jsonify({
+            "success": True,
+            "message": "Quote submitted successfully",
+            "quote_id": quote_request.id
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Simple quote submission error: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
 
 @app.route('/admin/whatsapp/<int:quote_id>')
 def admin_whatsapp_quote(quote_id):

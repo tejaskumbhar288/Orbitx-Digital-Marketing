@@ -1,0 +1,402 @@
+{% extends "base.html" %}
+
+{% block title %}Request a Quote - Get Your Design Project Estimate | OrbitX Design{% endblock %}
+
+{% block meta_description %}Get a detailed quote for your design project. Professional estimates for logo design, branding, social media graphics, packaging and more. Free consultation included.{% endblock %}
+
+{% block content %}
+<!-- Quote Hero -->
+<section class="quote-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content" data-aos="fade-up">
+                    <h1 class="hero-title">
+                        Get Your Custom
+                        <span class="gradient-text">Project Quote</span>
+                    </h1>
+                    <p class="hero-description">
+                        Ready to bring your design vision to life? Fill out our detailed quote form and receive
+                        a comprehensive project estimate within 24 hours, including timeline and deliverables.
+                    </p>
+
+                    <div class="quote-benefits">
+                        <div class="benefit-item">
+                            <i class="fas fa-clock"></i>
+                            <span>24-hour response time</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-calculator"></i>
+                            <span>Detailed cost breakdown</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-phone"></i>
+                            <span>Free consultation included</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="quote-visual" data-aos="fade-left">
+                    <div class="quote-illustration">
+                        <div class="quote-steps">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <span>Fill Form</span>
+                            </div>
+                            <div class="step-arrow">→</div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <span>AI Analysis</span>
+                            </div>
+                            <div class="step-arrow">→</div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <span>Get Quote</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quote Form -->
+<section class="quote-form-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="quote-form-container" data-aos="fade-up">
+                    <div class="form-header">
+                        <h2>Project Details</h2>
+                        <p>The more details you provide, the more accurate your quote will be.</p>
+                    </div>
+
+                    <!-- Success Message -->
+                    <div id="successMessage" class="alert alert-success" style="display: none;">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Success!</strong> Your quote has been submitted. You'll receive a response within 2 hours via email.
+                        <br><br>
+                        <i class="fas fa-mobile-alt me-2"></i>Our AI system has analyzed your request and sent a priority notification via SMS.
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="alert alert-danger" style="display: none;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Error!</strong> There was an issue submitting your quote. Please try again.
+                    </div>
+
+                    <!-- Loading Message -->
+                    <div id="loadingMessage" class="text-center" style="display: none; padding: 20px;">
+                        <i class="fas fa-spinner fa-spin me-2"></i>
+                        Submitting quote and running AI analysis...
+                    </div>
+
+                    <form id="simpleQuoteForm" class="quote-form">
+                        <!-- Basic Information -->
+                        <div class="form-step active">
+                            <div class="step-header">
+                                <h3><span class="step-number">1</span> Basic Information</h3>
+                                <p>Let's start with your contact details</p>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="client_name">Client Name</label>
+                                        <input type="text" class="form-control" id="client_name" name="client_name" maxlength="100" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="email">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email" maxlength="254" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="phone">Phone</label>
+                                        <input type="tel" class="form-control" id="phone" name="phone" maxlength="20">
+                                        <small class="form-text text-muted">For quick communication about your project</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="company_name">Company Name</label>
+                                        <input type="text" class="form-control" id="company_name" name="company_name" maxlength="100">
+                                        <small class="form-text text-muted">Optional - your business name</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Service Selection -->
+                        <div class="form-step active">
+                            <div class="step-header">
+                                <h3><span class="step-number">2</span> Service Selection</h3>
+                                <p>What type of design services do you need?</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="services_requested">Services Requested</label>
+                                <select class="form-control" id="services_requested" name="services_requested" required>
+                                    <option value="">Select a service...</option>
+                                    <option value="logo-design">Logo Design & Branding</option>
+                                    <option value="business-card">Business Card Design</option>
+                                    <option value="flyer-design">Flyer Design</option>
+                                    <option value="social-media">Social Media Creatives</option>
+                                    <option value="packaging">Packaging Design</option>
+                                    <option value="invitation-cards">Invitation Card Design</option>
+                                    <option value="powerpoint">PowerPoint Presentations</option>
+                                    <option value="campaign-design">Campaign Design</option>
+                                    <option value="label-design">Label Design</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <small class="form-text text-muted">Choose the primary service you need for this project</small>
+                            </div>
+                        </div>
+
+                        <!-- Project Details -->
+                        <div class="form-step active">
+                            <div class="step-header">
+                                <h3><span class="step-number">3</span> Project Details</h3>
+                                <p>Tell us more about your project requirements</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="project_description">Project Description</label>
+                                <textarea class="form-control" id="project_description" name="project_description" maxlength="2000" rows="5" required></textarea>
+                                <small class="form-text text-muted">Describe your vision, target audience, style preferences, and any specific requirements</small>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="budget_range">Budget Range</label>
+                                        <select class="form-control" id="budget_range" name="budget_range">
+                                            <option value="">Select budget range...</option>
+                                            <option value="500-1000">₹500 - ₹1,000</option>
+                                            <option value="1000-2500">₹1,000 - ₹2,500</option>
+                                            <option value="2500-5000">₹2,500 - ₹5,000</option>
+                                            <option value="5000-10000">₹5,000 - ₹10,000</option>
+                                            <option value="10000+">₹10,000+</option>
+                                            <option value="discuss">Let's Discuss</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="timeline">Timeline</label>
+                                        <select class="form-control" id="timeline" name="timeline">
+                                            <option value="">Select timeline...</option>
+                                            <option value="urgent">Urgent (1-2 days)</option>
+                                            <option value="week">Within a week</option>
+                                            <option value="two-weeks">2-3 weeks</option>
+                                            <option value="month">Within a month</option>
+                                            <option value="flexible">Flexible</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="additional_requirements">Additional Requirements</label>
+                                <textarea class="form-control" id="additional_requirements" name="additional_requirements" maxlength="1000" rows="4"></textarea>
+                                <small class="form-text text-muted">Any additional information, special requests, or files you'd like to share</small>
+                            </div>
+                        </div>
+
+                        <!-- Submit Section -->
+                        <div class="form-step active">
+                            <div class="step-header">
+                                <h3><span class="step-number">4</span> Submit & Get AI Analysis</h3>
+                                <p>Submit your quote for instant AI-powered analysis</p>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="subscribe_newsletter" name="subscribe_newsletter" value="y">
+                                    <label class="form-check-label" for="subscribe_newsletter">
+                                        Subscribe to our newsletter for design tips and updates
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="agreementCheck" required>
+                                    <label class="form-check-label" for="agreementCheck">
+                                        I agree to the terms and conditions and understand that this quote is an estimate.
+                                        Final pricing may vary based on project scope discussions.
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="step-navigation">
+                                <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
+                                    <i class="fas fa-rocket me-2"></i>Get AI-Enhanced Quote
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="quote-sidebar">
+                    <!-- AI Features Card -->
+                    <div class="sidebar-card ai-features" data-aos="fade-up">
+                        <h4>🤖 AI-Enhanced Process</h4>
+                        <div class="ai-features-list">
+                            <div class="ai-feature">
+                                <i class="fas fa-brain"></i>
+                                <span>Smart priority analysis</span>
+                            </div>
+                            <div class="ai-feature">
+                                <i class="fas fa-calculator"></i>
+                                <span>Intelligent value estimation</span>
+                            </div>
+                            <div class="ai-feature">
+                                <i class="fas fa-mobile-alt"></i>
+                                <span>Instant SMS notifications</span>
+                            </div>
+                            <div class="ai-feature">
+                                <i class="fas fa-clock"></i>
+                                <span>2-hour response guarantee</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing Guide -->
+                    <div class="sidebar-card pricing-guide" data-aos="fade-up" data-aos-delay="100">
+                        <h4>Pricing Guide</h4>
+                        <div class="pricing-list">
+                            <div class="pricing-item">
+                                <span class="service">Logo Design</span>
+                                <span class="price">₹5,000+</span>
+                            </div>
+                            <div class="pricing-item">
+                                <span class="service">Business Cards</span>
+                                <span class="price">₹2,000+</span>
+                            </div>
+                            <div class="pricing-item">
+                                <span class="service">Social Media Kit</span>
+                                <span class="price">₹3,000+</span>
+                            </div>
+                            <div class="pricing-item">
+                                <span class="service">Packaging Design</span>
+                                <span class="price">₹10,000+</span>
+                            </div>
+                            <div class="pricing-item">
+                                <span class="service">Complete Branding</span>
+                                <span class="price">₹25,000+</span>
+                            </div>
+                        </div>
+                        <div class="pricing-note">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Final pricing depends on project complexity and requirements</span>
+                        </div>
+                    </div>
+
+                    <!-- What's Included -->
+                    <div class="sidebar-card whats-included" data-aos="fade-up" data-aos-delay="200">
+                        <h4>What's Included</h4>
+                        <ul class="included-list">
+                            <li><i class="fas fa-check"></i> Initial consultation call</li>
+                            <li><i class="fas fa-check"></i> Custom design concepts</li>
+                            <li><i class="fas fa-check"></i> Unlimited revisions</li>
+                            <li><i class="fas fa-check"></i> Multiple file formats</li>
+                            <li><i class="fas fa-check"></i> Commercial usage rights</li>
+                            <li><i class="fas fa-check"></i> 30-day support</li>
+                        </ul>
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div class="sidebar-card contact-info" data-aos="fade-up" data-aos-delay="300">
+                        <h4>Need Help?</h4>
+                        <p>Have questions about the quote form or your project?</p>
+
+                        <div class="contact-options">
+                            <a href="tel:+919518754011" class="contact-btn">
+                                <i class="fas fa-phone"></i> Call Now
+                            </a>
+                            <a href="https://wa.me/919518754011?text=Hi%20OrbitX,%20I%20need%20help%20with%20my%20quote%20request" target="_blank" class="contact-btn">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('simpleQuoteForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Basic validation
+        if (!document.getElementById('agreementCheck').checked) {
+            alert('Please agree to the terms and conditions');
+            return;
+        }
+
+        // Show loading
+        document.getElementById('loadingMessage').style.display = 'block';
+        document.getElementById('successMessage').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'none';
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing with AI...';
+
+        // Collect form data
+        const formData = new FormData(this);
+        const data = {};
+        for (let [key, value] of formData.entries()) {
+            data[key] = value;
+        }
+
+        // Submit to simple endpoint
+        fetch('/quote/simple', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            document.getElementById('loadingMessage').style.display = 'none';
+
+            if (result.success) {
+                document.getElementById('successMessage').style.display = 'block';
+                // Scroll to success message
+                document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+                form.style.display = 'none';
+            } else {
+                document.getElementById('errorMessage').style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-rocket me-2"></i>Get AI-Enhanced Quote';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'block';
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-rocket me-2"></i>Get AI-Enhanced Quote';
+        });
+    });
+});
+</script>
+{% endblock %}
