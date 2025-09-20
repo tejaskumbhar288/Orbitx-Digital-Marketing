@@ -31,6 +31,7 @@ class QuoteForm(FlaskForm):
     phone = StringField('Phone', validators=[Optional(), Length(max=20)])
     company_name = StringField('Company Name', validators=[Optional(), Length(max=100)])
     services_requested = SelectField('Services Requested', choices=[
+        ('', 'Select a service...'),
         ('logo-design', 'Logo Design & Branding'),
         ('business-card', 'Business Card Design'),
         ('flyer-design', 'Flyer Design'),
@@ -57,8 +58,8 @@ class QuoteForm(FlaskForm):
         ('month', 'Within a month'),
         ('flexible', 'Flexible')
     ], validators=[Optional()])
-    project_description = TextAreaField('Project Description', validators=[DataRequired(), Length(min=10)])
-    additional_requirements = TextAreaField('Additional Requirements', validators=[Optional()])
+    project_description = TextAreaField('Project Description', validators=[DataRequired(), Length(min=10, max=2000)])
+    additional_requirements = TextAreaField('Additional Requirements', validators=[Optional(), Length(max=1000)])
     reference_files = FileField('Reference Files (Optional)', validators=[
         FileAllowed(['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx'], 'Images and documents only!')
     ])

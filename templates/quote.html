@@ -141,31 +141,8 @@
                             
                             <div class="form-group">
                                 {{ form.services_requested.label(class="form-label") }}
-                                <div class="services-grid">
-                                    {% for subfield in form.services_requested %}
-                                    <div class="service-option">
-                                        {{ subfield(class="service-checkbox") }}
-                                        {{ subfield.label(class="service-label") }}
-                                        <div class="service-description">
-                                            {% if 'Logo' in subfield.label.text %}
-                                                Complete brand identity including logo, colors, and guidelines
-                                            {% elif 'Business Card' in subfield.label.text %}
-                                                Professional business card design with premium layouts
-                                            {% elif 'Social Media' in subfield.label.text %}
-                                                Instagram, Facebook, LinkedIn post designs and templates
-                                            {% elif 'Packaging' in subfield.label.text %}
-                                                Product packaging design with 3D mockups
-                                            {% elif 'Flyer' in subfield.label.text %}
-                                                Marketing flyers and promotional materials
-                                            {% elif 'PowerPoint' in subfield.label.text %}
-                                                Professional presentation slides and templates
-                                            {% else %}
-                                                Professional design services tailored to your needs
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
+                                {{ form.services_requested(class="form-control" + (" is-invalid" if form.services_requested.errors else "")) }}
+                                <small class="form-text text-muted">Choose the primary service you need for this project</small>
                                 {% if form.services_requested.errors %}
                                     <div class="invalid-feedback d-block">
                                         {% for error in form.services_requested.errors %}{{ error }}{% endfor %}
@@ -261,9 +238,16 @@
                             
                             <div class="form-group">
                                 <div class="form-check">
+                                    {{ form.subscribe_newsletter(class="form-check-input") }}
+                                    {{ form.subscribe_newsletter.label(class="form-check-label") }}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="agreementCheck" required>
                                     <label class="form-check-label" for="agreementCheck">
-                                        I agree to the terms and conditions and understand that this quote is an estimate. 
+                                        I agree to the terms and conditions and understand that this quote is an estimate.
                                         Final pricing may vary based on project scope discussions.
                                     </label>
                                 </div>
@@ -468,19 +452,20 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Special validation for step 2 (services)
         if (stepNumber === 2) {
-            const checkboxes = step.querySelectorAll('input[type="checkbox"]');
-            const isAnyChecked = Array.from(checkboxes).some(cb => cb.checked);
-            if (!isAnyChecked) {
+            const serviceSelect = step.querySelector('select[name="services_requested"]');
+            if (!serviceSelect.value || serviceSelect.value === '') {
                 isValid = false;
+                serviceSelect.classList.add('is-invalid');
                 // Show error message
-                const errorDiv = step.querySelector('.invalid-feedback') || document.createElement('div');
-                errorDiv.className = 'invalid-feedback d-block';
-                errorDiv.textContent = 'Please select at least one service';
-                const servicesGrid = step.querySelector('.services-grid');
-                if (!step.querySelector('.invalid-feedback')) {
-                    servicesGrid.parentNode.appendChild(errorDiv);
+                let errorDiv = step.querySelector('.invalid-feedback');
+                if (!errorDiv) {
+                    errorDiv = document.createElement('div');
+                    errorDiv.className = 'invalid-feedback d-block';
+                    serviceSelect.parentNode.appendChild(errorDiv);
                 }
+                errorDiv.textContent = 'Please select a service';
             } else {
+                serviceSelect.classList.remove('is-invalid');
                 const errorDiv = step.querySelector('.invalid-feedback');
                 if (errorDiv) errorDiv.remove();
             }
@@ -527,16 +512,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Services
         html += '<div class="summary-section">';
-        html += '<h5><i class="fas fa-list"></i> Selected Services</h5>';
-        const services = formData.getAll('services_requested');
-        if (services.length > 0) {
-            html += '<ul>';
-            services.forEach(service => {
-                html += `<li>${service}</li>`;
-            });
-            html += '</ul>';
+        html += '<h5><i class="fas fa-list"></i> Selected Service</h5>';
+        const service = formData.get('services_requested');
+        if (service) {
+            html += `<p>${service}</p>`;
         } else {
-            html += '<p>No services selected</p>';
+            html += '<p>No service selected</p>';
         }
         html += '</div>';
         
@@ -561,36 +542,27 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Form submission
     form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
         if (!document.getElementById('agreementCheck').checked) {
+            e.preventDefault();
             alert('Please agree to the terms and conditions');
             return;
         }
-        
+
         const submitBtn = form.querySelector('button[type="submit"]');
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting Quote Request...';
         submitBtn.disabled = true;
-        
-        // Simulate form submission (replace with actual submission)
-        setTimeout(() => {
-            document.querySelector('.quote-form-section').style.display = 'none';
-            document.getElementById('quoteSuccess').classList.remove('d-none');
-            window.scrollTo(0, 0);
-        }, 2000);
+
+        // Allow the form to submit naturally to Flask backend
+        // Don't prevent default - let it submit to the server
     });
     
-    // Service selection enhancements
-    document.querySelectorAll('.service-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            const serviceOption = this.closest('.service-option');
-            if (this.checked) {
-                serviceOption.classList.add('selected');
-            } else {
-                serviceOption.classList.remove('selected');
-            }
+    // Service selection enhancement (for select dropdown)
+    const serviceSelect = document.querySelector('select[name="services_requested"]');
+    if (serviceSelect) {
+        serviceSelect.addEventListener('change', function() {
+            // You can add any visual enhancements for service selection here
         });
-    });
+    }
     
     // File upload preview
     const fileInput = document.querySelector('input[type="file"]');
