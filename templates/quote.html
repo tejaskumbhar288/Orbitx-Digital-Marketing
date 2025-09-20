@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+<!-- CACHE BUSTER v2024-09-20-6:20 -->
 
 {% block title %}Request a Quote - Get Your Design Project Estimate | OrbitX Design{% endblock %}
 
@@ -87,7 +88,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         {{ form.client_name.label(class="form-label") }}
-                                        {{ form.client_name(class="form-control" + (" is-invalid" if form.client_name.errors else ""), maxlength="100") }}
+                                        <input type="text" class="form-control" id="client_name" name="client_name" maxlength="100" required>
                                         {% if form.client_name.errors %}
                                             <div class="invalid-feedback">
                                                 {% for error in form.client_name.errors %}{{ error }}{% endfor %}
@@ -98,7 +99,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         {{ form.email.label(class="form-label") }}
-                                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), maxlength="254") }}
+                                        <input type="email" class="form-control" id="email" name="email" maxlength="254" required>
                                         {% if form.email.errors %}
                                             <div class="invalid-feedback">
                                                 {% for error in form.email.errors %}{{ error }}{% endfor %}
@@ -205,7 +206,7 @@
                             
                             <div class="form-group">
                                 {{ form.additional_requirements.label(class="form-label") }}
-                                {{ form.additional_requirements(class="form-control", maxlength="1000") }}
+                                <textarea class="form-control" id="additional_requirements" name="additional_requirements" maxlength="1000" rows="4"></textarea>
                                 <small class="form-text text-muted">Any additional information, special requests, or files you'd like to share</small>
                             </div>
                             
