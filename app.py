@@ -7,6 +7,8 @@ import os
 from datetime import datetime
 import logging
 from dotenv import load_dotenv
+import urllib.parse
+import webbrowser
 
 # Load environment variables
 load_dotenv()
@@ -177,32 +179,38 @@ def quote():
             db.session.add(quote_request)
             db.session.commit()
 
-            # Send email notification
-            if app.config['MAIL_USERNAME']:
-                try:
-                    msg = Message(
-                        subject=f"New Quote Request from {form.client_name.data}",
-                        recipients=[app.config['MAIL_USERNAME']],
-                        body=f"""
-New quote request received:
+            # Send WhatsApp notification
+            try:
+                # Prepare WhatsApp message
+                whatsapp_message = f"""🎯 NEW QUOTE REQUEST - OrbitX
 
-Client: {form.client_name.data}
-Email: {form.email.data}
-Service: {form.services_requested.data}
-Budget: {form.budget_range.data}
-Timeline: {form.timeline.data}
+👤 Client: {quote_request.client_name}
+📧 Email: {quote_request.email}
+📱 Phone: {quote_request.phone or 'Not provided'}
+🏢 Company: {quote_request.company_name or 'Not provided'}
 
-Project Description:
-{form.project_description.data}
+🛠️ Service: {quote_request.services_requested}
+💰 Budget: {quote_request.budget_range or 'Not specified'}
+⏰ Timeline: {quote_request.timeline or 'Not specified'}
 
-Please prepare and send a detailed quote.
-                        """
-                    )
-                    mail.send(msg)
-                except Exception as e:
-                    app.logger.error(f"Failed to send email: {e}")
+📝 Project Description:
+{quote_request.project_description}
 
-            flash('Thank you! We\'ve received your quote request and will send you a detailed proposal within 24 hours.', 'success')
+📋 Additional Requirements:
+{quote_request.additional_requirements or 'None specified'}
+
+⚡ Action Required: Prepare and send detailed quote to {quote_request.email}"""
+
+                # URL encode the message for WhatsApp
+                encoded_message = urllib.parse.quote(whatsapp_message)
+                whatsapp_url = f"https://wa.me/919518536672?text={encoded_message}"
+
+                app.logger.info(f"WhatsApp URL generated for quote request from {quote_request.client_name}")
+
+            except Exception as e:
+                app.logger.error(f"Failed to generate WhatsApp URL: {e}")
+
+            flash('Thank you! We\'ve received your quote request. Our team will contact you within 2 hours via WhatsApp/Email with a detailed proposal.', 'success')
             return redirect(url_for('quote'))
 
         except Exception as e:
@@ -211,6 +219,37 @@ Please prepare and send a detailed quote.
             flash('Sorry, there was an error submitting your request. Please try again.', 'error')
 
     return render_template('quote.html', form=form)
+
+@app.route('/admin/whatsapp/<int:quote_id>')
+def admin_whatsapp_quote(quote_id):
+    """Admin route to open WhatsApp with quote details"""
+    quote_request = QuoteRequest.query.get_or_404(quote_id)
+
+    # Prepare WhatsApp message
+    whatsapp_message = f"""🎯 NEW QUOTE REQUEST - OrbitX
+
+👤 Client: {quote_request.client_name}
+📧 Email: {quote_request.email}
+📱 Phone: {quote_request.phone or 'Not provided'}
+🏢 Company: {quote_request.company_name or 'Not provided'}
+
+🛠️ Service: {quote_request.services_requested}
+💰 Budget: {quote_request.budget_range or 'Not specified'}
+⏰ Timeline: {quote_request.timeline or 'Not specified'}
+
+📝 Project Description:
+{quote_request.project_description}
+
+📋 Additional Requirements:
+{quote_request.additional_requirements or 'None specified'}
+
+⚡ Action Required: Prepare and send detailed quote to {quote_request.email}"""
+
+    # URL encode the message for WhatsApp
+    encoded_message = urllib.parse.quote(whatsapp_message)
+    whatsapp_url = f"https://wa.me/919518536672?text={encoded_message}"
+
+    return redirect(whatsapp_url)
 
 @app.route('/blog')
 def blog():
