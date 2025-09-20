@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - Sarvesh Kumbhar Design Services{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 text-center">
+            <div class="error-page py-5">
+                <h1 class="display-1 text-primary">404</h1>
+                <h2 class="mb-4">Page Not Found</h2>
+                <p class="lead mb-4">
+                    Sorry, the page you're looking for doesn't exist.
+                    It might have been moved, deleted, or you entered the wrong URL.
+                </p>
+
+                <div class="error-actions">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary me-3">
+                        <i class="fas fa-home me-2"></i>Go Home
+                    </a>
+                    <a href="{{ url_for('contact') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-phone me-2"></i>Contact Us
+                    </a>
+                </div>
+
+                <div class="mt-5">
+                    <h5>Popular Pages:</h5>
+                    <div class="quick-links">
+                        <a href="{{ url_for('services') }}" class="btn btn-link">Our Services</a>
+                        <a href="{{ url_for('portfolio') }}" class="btn btn-link">Portfolio</a>
+                        <a href="{{ url_for('quote') }}" class="btn btn-link">Get Quote</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

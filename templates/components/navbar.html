@@ -1,0 +1,51 @@
+<nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNavbar">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Pixel Media Design" height="60" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+            <span class="brand-text d-none">SK Design</span>
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'index' else '' }}" href="{{ url_for('index') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'about' else '' }}" href="{{ url_for('about') }}">About</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {{ 'active' if request.endpoint in ['services', 'service_detail'] else '' }}" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Services
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
+                        <li><a class="dropdown-item" href="{{ url_for('services') }}">All Services</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('services') }}#logo-design">Logo Design & Branding</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('services') }}#business-cards">Business Card Design</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('services') }}#social-media">Social Media Creatives</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('services') }}#packaging">Packaging Design</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('services') }}#presentations">PowerPoint Presentations</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'portfolio' else '' }}" href="{{ url_for('portfolio') }}">Portfolio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'case_studies' else '' }}" href="{{ url_for('case_studies') }}">Case Studies</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'contact' else '' }}" href="{{ url_for('contact') }}">Contact</a>
+                </li>
+                <li class="nav-item ms-2">
+                    <a class="btn btn-primary nav-cta" href="{{ url_for('quote') }}">
+                        <i class="fas fa-rocket me-2"></i>Start Your Project
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

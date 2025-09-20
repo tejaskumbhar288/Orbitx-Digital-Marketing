@@ -1,0 +1,518 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }} - Case Study | Pixel Media{% endblock %}
+
+{% block meta_description %}Explore our step-by-step design process for {{ project.name }}. See how Pixel Media transforms ideas into exceptional designs.{% endblock %}
+
+{% block content %}
+<!-- Case Study Hero -->
+<section class="case-study-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content" data-aos="fade-up">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('case_studies') }}">Case Studies</a></li>
+                            <li class="breadcrumb-item active">{{ project.name }}</li>
+                        </ol>
+                    </nav>
+                    
+                    <div class="project-badge">
+                        <i class="fas fa-award me-2"></i>
+                        <span>Featured Case Study</span>
+                    </div>
+                    
+                    <h1 class="hero-title">{{ project.name }}</h1>
+                    <p class="hero-description">{{ project.description }}</p>
+                    
+                    <div class="project-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-tag"></i>
+                            <span>{{ project.category }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>{{ project.duration }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-layers"></i>
+                            <span>{{ project.steps_count }} Steps</span>
+                        </div>
+                    </div>
+                    
+                    <div class="hero-cta">
+                        <a href="#process-viewer" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-play me-2"></i>View Process
+                        </a>
+                        <a href="{{ url_for('contact') }}" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-rocket me-2"></i>Start Your Project
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-visual" data-aos="fade-left">
+                    <div class="project-preview">
+                        <img src="/static/images/{{ project.folder }}/service-1.png" 
+                             alt="{{ project.name }}" 
+                             onerror="this.src='/static/images/placeholder-case-study.jpg'">
+                        <div class="preview-overlay">
+                            <div class="play-button" onclick="caseStudyViewer.startViewing()">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Project Overview -->
+<section class="project-overview">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="overview-content text-center" data-aos="fade-up">
+                    <h2 class="section-title">Project <span class="gradient-text">Overview</span></h2>
+                    <div class="overview-grid">
+                        <div class="overview-card">
+                            <div class="card-icon">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <h4>Challenge</h4>
+                            <p>{{ project.challenge or "Create a comprehensive brand identity that resonates with the target audience and stands out in a competitive market." }}</p>
+                        </div>
+                        <div class="overview-card">
+                            <div class="card-icon">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <h4>Solution</h4>
+                            <p>{{ project.solution or "Developed a strategic design approach combining market research, creative exploration, and iterative refinement." }}</p>
+                        </div>
+                        <div class="overview-card">
+                            <div class="card-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <h4>Result</h4>
+                            <p>{{ project.result or "Delivered a cohesive brand identity that increased client recognition and engagement significantly." }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Step-by-Step Process Viewer -->
+<section class="process-viewer-section" id="process-viewer">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+            <h2 class="section-title">Design <span class="gradient-text">Process</span></h2>
+            <p class="section-description">Follow our step-by-step approach to creating exceptional design</p>
+        </div>
+        
+        <!-- Process Navigation -->
+        <div class="process-navigation" data-aos="fade-up" data-aos-delay="100">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="step-indicators" id="stepIndicators">
+                <!-- Step indicators will be generated dynamically -->
+            </div>
+        </div>
+        
+        <!-- Process Viewer -->
+        <div class="process-viewer" id="processViewer">
+            <div class="viewer-container">
+                <!-- Loading State -->
+                <div class="viewer-loading" id="viewerLoading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading design process...</p>
+                </div>
+                
+                <!-- Process Content -->
+                <div class="process-content" id="processContent" style="display: none;">
+                    <div class="step-image-container">
+                        <img id="stepImage" src="" alt="" class="step-image">
+                        <div class="image-controls">
+                            <button class="zoom-btn" id="zoomBtn">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="step-info">
+                        <div class="step-header">
+                            <span class="step-counter" id="stepCounter">Step 1 of 15</span>
+                            <h3 class="step-title" id="stepTitle">Initial Research</h3>
+                        </div>
+                        <div class="step-description" id="stepDescription">
+                            <p>Understanding the client's vision, target audience, and market positioning to establish a solid foundation for the design process.</p>
+                        </div>
+                        <div class="step-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span id="stepDuration">2-3 hours</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-tools"></i>
+                                <span id="stepTools">Research, Analysis</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation Controls -->
+                <div class="viewer-controls">
+                    <button class="control-btn prev-btn" id="prevBtn" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                        <span>Previous</span>
+                    </button>
+                    
+                    <div class="auto-play-controls">
+                        <button class="control-btn play-pause-btn" id="playPauseBtn">
+                            <i class="fas fa-play"></i>
+                            <span>Auto Play</span>
+                        </button>
+                        <div class="speed-control">
+                            <label>Speed:</label>
+                            <select id="speedControl">
+                                <option value="1000">Slow</option>
+                                <option value="500" selected>Normal</option>
+                                <option value="250">Fast</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button class="control-btn next-btn" id="nextBtn">
+                        <span>Next</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Process Summary -->
+        <div class="process-summary" data-aos="fade-up">
+            <div class="summary-stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalSteps">15</span>
+                    <span class="stat-label">Design Steps</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="totalTime">2-3</span>
+                    <span class="stat-label">Weeks</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="revisionRounds">3</span>
+                    <span class="stat-label">Revision Rounds</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Satisfaction</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Client Testimonial -->
+<section class="case-study-testimonial">
+    <div class="container">
+        <div class="testimonial-card" data-aos="fade-up">
+            <div class="testimonial-content">
+                <div class="quote-icon">
+                    <i class="fas fa-quote-left"></i>
+                </div>
+                <blockquote>
+                    "{{ project.testimonial or 'Working with Pixel Media was an exceptional experience. Their attention to detail and creative process resulted in a brand identity that perfectly captures our vision and resonates with our customers.' }}"
+                </blockquote>
+                <div class="testimonial-author">
+                    <div class="author-info">
+                        <h5>{{ project.client_name or "Client Name" }}</h5>
+                        <p>{{ project.client_position or "Founder & CEO" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Related Projects -->
+<section class="related-projects">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+            <h2 class="section-title">More <span class="gradient-text">Case Studies</span></h2>
+            <p class="section-description">Explore our other featured projects</p>
+        </div>
+        
+        <div class="row">
+            <!-- This would be populated with related projects -->
+            <div class="col-lg-6 mb-4" data-aos="fade-up">
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="/static/images/Gardenia-project/service-1.png" alt="Gardenia Project" 
+                             onerror="this.src='/static/images/placeholder-case-study.jpg'">
+                        <div class="project-overlay">
+                            <h4>Gardenia Project</h4>
+                            <p>Brand Identity Design</p>
+                            <a href="#" class="btn btn-sm btn-outline-light">View Case Study</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="/static/images/Miracle-pows-project/service-1.png" alt="Miracle Pows Project" 
+                             onerror="this.src='/static/images/placeholder-case-study.jpg'">
+                        <div class="project-overlay">
+                            <h4>Miracle Pows Project</h4>
+                            <p>Packaging Design</p>
+                            <a href="#" class="btn btn-sm btn-outline-light">View Case Study</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="case-study-cta">
+    <div class="container">
+        <div class="cta-content text-center" data-aos="fade-up">
+            <h2 class="cta-title">Ready to Start Your Own Success Story?</h2>
+            <p class="cta-description">Let's create something amazing together. Get in touch to discuss your project.</p>
+            <div class="cta-buttons">
+                <a href="{{ url_for('quote') }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-quote-right me-2"></i>Get Project Quote
+                </a>
+                <a href="{{ url_for('contact') }}" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-phone me-2"></i>Schedule a Call
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Case Study Viewer System
+class CaseStudyViewer {
+    constructor() {
+        this.projectName = '{{ project.folder }}';
+        this.currentStep = 0;
+        this.totalSteps = {{ project.steps_count or 15 }};
+        this.isPlaying = false;
+        this.playInterval = null;
+        this.speed = 500;
+        
+        this.steps = [];
+        this.init();
+    }
+    
+    init() {
+        this.generateStepData();
+        this.bindEvents();
+        this.renderStepIndicators();
+        this.loadStep(0);
+    }
+    
+    generateStepData() {
+        // Generate step data based on project
+        const stepTemplates = [
+            { title: "Initial Research", description: "Understanding client requirements and market analysis", duration: "2-3 hours", tools: "Research, Analysis" },
+            { title: "Concept Development", description: "Brainstorming and initial concept sketches", duration: "1-2 days", tools: "Sketching, Ideation" },
+            { title: "Design Exploration", description: "Exploring different design directions and styles", duration: "2-3 days", tools: "Adobe Creative Suite" },
+            { title: "Client Feedback", description: "Presenting concepts and gathering client input", duration: "1 day", tools: "Presentation, Communication" },
+            { title: "Refinement", description: "Refining selected concepts based on feedback", duration: "1-2 days", tools: "Design Software" },
+            { title: "Color Development", description: "Developing color palettes and variations", duration: "1 day", tools: "Color Theory, Adobe" },
+            { title: "Typography Selection", description: "Choosing appropriate fonts and text treatments", duration: "Half day", tools: "Typography, Font Libraries" },
+            { title: "Layout Design", description: "Creating layouts and composition arrangements", duration: "1-2 days", tools: "Layout Software" },
+            { title: "Digital Mockups", description: "Creating realistic digital representations", duration: "1 day", tools: "Mockup Tools" },
+            { title: "Client Review", description: "Second round of client feedback and approval", duration: "1 day", tools: "Presentation" },
+            { title: "Final Adjustments", description: "Making final tweaks and improvements", duration: "1 day", tools: "Design Software" },
+            { title: "Asset Creation", description: "Creating various file formats and sizes", duration: "Half day", tools: "Export Tools" },
+            { title: "Brand Guidelines", description: "Documenting usage guidelines and specifications", duration: "1 day", tools: "Documentation" },
+            { title: "Delivery Preparation", description: "Organizing files and preparing final deliverables", duration: "Half day", tools: "File Management" },
+            { title: "Project Completion", description: "Final delivery and client handover", duration: "Half day", tools: "Communication" }
+        ];
+        
+        for (let i = 0; i < this.totalSteps; i++) {
+            const template = stepTemplates[i] || stepTemplates[stepTemplates.length - 1];
+            this.steps.push({
+                index: i,
+                title: template.title,
+                description: template.description,
+                duration: template.duration,
+                tools: template.tools,
+                imageSrc: `/static/images/${this.projectName}/service-${i + 1}.png`
+            });
+        }
+    }
+    
+    bindEvents() {
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const speedControl = document.getElementById('speedControl');
+        const zoomBtn = document.getElementById('zoomBtn');
+        
+        prevBtn.addEventListener('click', () => this.previousStep());
+        nextBtn.addEventListener('click', () => this.nextStep());
+        playPauseBtn.addEventListener('click', () => this.toggleAutoPlay());
+        speedControl.addEventListener('change', (e) => this.changeSpeed(e.target.value));
+        zoomBtn.addEventListener('click', () => this.openImageInLightbox());
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') this.previousStep();
+            if (e.key === 'ArrowRight') this.nextStep();
+            if (e.key === ' ') { e.preventDefault(); this.toggleAutoPlay(); }
+        });
+    }
+    
+    renderStepIndicators() {
+        const container = document.getElementById('stepIndicators');
+        container.innerHTML = '';
+        
+        for (let i = 0; i < this.totalSteps; i++) {
+            const indicator = document.createElement('div');
+            indicator.className = 'step-indicator';
+            indicator.innerHTML = `<span>${i + 1}</span>`;
+            indicator.addEventListener('click', () => this.loadStep(i));
+            container.appendChild(indicator);
+        }
+    }
+    
+    loadStep(index) {
+        if (index < 0 || index >= this.totalSteps) return;
+        
+        this.currentStep = index;
+        const step = this.steps[index];
+        
+        // Update content
+        document.getElementById('stepCounter').textContent = `Step ${index + 1} of ${this.totalSteps}`;
+        document.getElementById('stepTitle').textContent = step.title;
+        document.getElementById('stepDescription').innerHTML = `<p>${step.description}</p>`;
+        document.getElementById('stepDuration').textContent = step.duration;
+        document.getElementById('stepTools').textContent = step.tools;
+        
+        // Update image
+        const stepImage = document.getElementById('stepImage');
+        stepImage.src = step.imageSrc;
+        stepImage.onerror = () => {
+            stepImage.src = '/static/images/placeholder-case-study.jpg';
+        };
+        
+        // Update progress
+        this.updateProgress();
+        this.updateIndicators();
+        this.updateControls();
+        
+        // Show content
+        document.getElementById('viewerLoading').style.display = 'none';
+        document.getElementById('processContent').style.display = 'block';
+    }
+    
+    updateProgress() {
+        const progress = ((this.currentStep + 1) / this.totalSteps) * 100;
+        document.getElementById('progressFill').style.width = `${progress}%`;
+    }
+    
+    updateIndicators() {
+        const indicators = document.querySelectorAll('.step-indicator');
+        indicators.forEach((indicator, index) => {
+            indicator.classList.toggle('active', index === this.currentStep);
+            indicator.classList.toggle('completed', index < this.currentStep);
+        });
+    }
+    
+    updateControls() {
+        document.getElementById('prevBtn').disabled = this.currentStep === 0;
+        document.getElementById('nextBtn').disabled = this.currentStep === this.totalSteps - 1;
+    }
+    
+    previousStep() {
+        if (this.currentStep > 0) {
+            this.loadStep(this.currentStep - 1);
+        }
+    }
+    
+    nextStep() {
+        if (this.currentStep < this.totalSteps - 1) {
+            this.loadStep(this.currentStep + 1);
+        }
+    }
+    
+    toggleAutoPlay() {
+        this.isPlaying = !this.isPlaying;
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        
+        if (this.isPlaying) {
+            this.playInterval = setInterval(() => {
+                if (this.currentStep < this.totalSteps - 1) {
+                    this.nextStep();
+                } else {
+                    this.toggleAutoPlay(); // Stop at end
+                }
+            }, parseInt(this.speed));
+            
+            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i><span>Pause</span>';
+        } else {
+            clearInterval(this.playInterval);
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i><span>Auto Play</span>';
+        }
+    }
+    
+    changeSpeed(newSpeed) {
+        this.speed = parseInt(newSpeed);
+        if (this.isPlaying) {
+            this.toggleAutoPlay();
+            this.toggleAutoPlay(); // Restart with new speed
+        }
+    }
+    
+    openImageInLightbox() {
+        // Integration with lightbox system
+        if (window.portfolioGallery && window.portfolioGallery.openLightbox) {
+            // Create a temporary image for lightbox
+            const tempImages = [{
+                src: this.steps[this.currentStep].imageSrc,
+                title: this.steps[this.currentStep].title,
+                description: this.steps[this.currentStep].description
+            }];
+            
+            window.portfolioGallery.currentImages = tempImages;
+            window.portfolioGallery.openLightbox(0);
+        }
+    }
+    
+    startViewing() {
+        document.getElementById('process-viewer').scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+        
+        // Auto-start after scroll
+        setTimeout(() => {
+            if (!this.isPlaying) {
+                this.toggleAutoPlay();
+            }
+        }, 1000);
+    }
+}
+
+// Initialize case study viewer
+let caseStudyViewer;
+document.addEventListener('DOMContentLoaded', function() {
+    caseStudyViewer = new CaseStudyViewer();
+});
+</script>
+{% endblock %}

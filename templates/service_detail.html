@@ -1,0 +1,696 @@
+{% extends "base.html" %}
+
+{% block title %}{{ service.name }} - Professional Design Services{% endblock %}
+
+{% block meta_description %}{{ service.description[:155] }}{% endblock %}
+
+{% block content %}
+<section class="service-detail-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content" data-aos="fade-up">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('services') }}">Services</a></li>
+                            <li class="breadcrumb-item active">{{ service.name }}</li>
+                        </ol>
+                    </nav>
+                    
+                    <div class="service-badge">
+                        <i class="{{ service.icon_class }} me-2"></i>
+                        <span>Professional Service</span>
+                    </div>
+                    
+                    <h1 class="hero-title">{{ service.name }}</h1>
+                    <p class="hero-description">{{ service.description }}</p>
+                    
+                    <div class="service-highlights">
+                        <div class="highlight-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Quick Turnaround</span>
+                        </div>
+                        <div class="highlight-item">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Unlimited Revisions</span>
+                        </div>
+                        <div class="highlight-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>100% Satisfaction</span>
+                        </div>
+                    </div>
+                    
+                    <div class="hero-cta">
+                        <a href="{{ url_for('quote') }}?service={{ service.name }}" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-quote-right me-2"></i>Get Quote
+                        </a>
+                        <a href="{{ url_for('contact') }}" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-phone me-2"></i>Discuss Project
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-visual" data-aos="fade-left">
+                    <div class="service-showcase">
+                        <img src="{{ url_for('static', filename='images/services/' + service.name.lower().replace(' ', '-') + '-hero.jpg') }}" 
+                             alt="{{ service.name }}" 
+                             onerror="this.src='{{ url_for('static', filename='images/placeholder-service-hero.jpg') }}'">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Service Details -->
+<section class="service-details-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- What's Included -->
+                <div class="detail-card" data-aos="fade-up">
+                    <h3 class="card-title">What's Included in This Service</h3>
+                    <div class="includes-grid">
+                        {% if 'Logo' in service.name %}
+                        <div class="include-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <h5>Initial Concepts</h5>
+                                <p>3-5 unique logo concepts based on your brief</p>
+                            </div>
+                        </div>
+                        <div class="include-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <h5>Brand Colors</h5>
+                                <p>Professional color palette with hex codes</p>
+                            </div>
+                        </div>
+                        <div class="include-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <h5>Typography Guide</h5>
+                                <p>Recommended fonts and usage guidelines</p>
+                            </div>
+                        </div>
+                        <div class="include-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <h5>Multiple Formats</h5>
+                                <p>Vector and raster files for all uses</p>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="include-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <h5>Custom Design</h5>
+                                <p>Tailored design based on your requirements</p>
+                            </div>
+                        </div>
+                        <div class="include-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <h5>Professional Quality</h5>
+                                <p>High-resolution, print-ready files</p>
+                            </div>
+                        </div>
+                        <div class="include-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <h5>Multiple Options</h5>
+                                <p>2-3 design variations to choose from</p>
+                            </div>
+                        </div>
+                        <div class="include-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <h5>Source Files</h5>
+                                <p>Editable files for future modifications</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Process -->
+                <div class="detail-card" data-aos="fade-up">
+                    <h3 class="card-title">Our Design Process</h3>
+                    <div class="process-timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker">1</div>
+                            <div class="timeline-content">
+                                <h5>Project Briefing</h5>
+                                <p>We discuss your requirements, preferences, and project goals in detail.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker">2</div>
+                            <div class="timeline-content">
+                                <h5>Research & Concept</h5>
+                                <p>Our team researches your industry and develops initial design concepts.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker">3</div>
+                            <div class="timeline-content">
+                                <h5>Design Development</h5>
+                                <p>We create detailed designs and present them for your review and feedback.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker">4</div>
+                            <div class="timeline-content">
+                                <h5>Refinement</h5>
+                                <p>Based on your feedback, we refine and perfect the chosen design.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker">5</div>
+                            <div class="timeline-content">
+                                <h5>Final Delivery</h5>
+                                <p>You receive all final files in the formats you need for immediate use.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enhanced Portfolio Gallery -->
+                <div class="detail-card" data-aos="fade-up">
+                    <div class="section-header">
+                        <h3 class="card-title">{{ service.name }} Portfolio</h3>
+                        <p class="card-subtitle">Explore our latest projects and get inspired</p>
+                    </div>
+                    
+                    <!-- Gallery Filters -->
+                    <div class="gallery-filters">
+                        <button class="filter-btn active" data-filter="all">
+                            <i class="fas fa-th me-2"></i>All Projects
+                        </button>
+                        <button class="filter-btn" data-filter="recent">
+                            <i class="fas fa-clock me-2"></i>Recent
+                        </button>
+                        <button class="filter-btn" data-filter="featured">
+                            <i class="fas fa-star me-2"></i>Featured
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Portfolio Gallery -->
+                    <div class="enhanced-portfolio-gallery" id="portfolioGallery">
+                        <div class="gallery-grid masonry-grid" id="galleryGrid">
+                            <!-- Images will be loaded dynamically -->
+                            <div class="gallery-loading">
+                                <div class="loading-spinner"></div>
+                                <p>Loading amazing designs...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gallery Navigation -->
+                    <div class="gallery-navigation">
+                        <button class="btn btn-outline-secondary" id="loadMoreBtn">
+                            <i class="fas fa-plus me-2"></i>Load More Projects
+                        </button>
+                        <a href="{{ url_for('portfolio') }}" class="btn btn-primary">
+                            <i class="fas fa-images me-2"></i>View Full Portfolio
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="service-sidebar">
+                    <!-- Pricing Card -->
+                    <div class="sidebar-card pricing-card" data-aos="fade-up">
+                        <h4>Service Pricing</h4>
+                        <div class="price-display">
+                            <span class="price-from">Starting from</span>
+                            <span class="price-amount">{{ service.price_range.split(' - ')[0] if service.price_range else '₹Contact' }}</span>
+                        </div>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check"></i> Professional Design</li>
+                            <li><i class="fas fa-check"></i> Unlimited Revisions</li>
+                            <li><i class="fas fa-check"></i> Multiple File Formats</li>
+                            <li><i class="fas fa-check"></i> Commercial License</li>
+                            <li><i class="fas fa-check"></i> 30-Day Support</li>
+                        </ul>
+                        <a href="{{ url_for('quote') }}?service={{ service.name }}" class="btn btn-primary btn-block">
+                            <i class="fas fa-quote-right me-2"></i>Get Custom Quote
+                        </a>
+                    </div>
+
+                    <!-- Timeline Card -->
+                    <div class="sidebar-card timeline-card" data-aos="fade-up" data-aos-delay="100">
+                        <h4>Project Timeline</h4>
+                        <div class="timeline-info">
+                            <div class="timeline-step">
+                                <span class="step-day">Day 1</span>
+                                <span class="step-task">Project briefing & research</span>
+                            </div>
+                            <div class="timeline-step">
+                                <span class="step-day">Day 2-3</span>
+                                <span class="step-task">Initial concepts & presentation</span>
+                            </div>
+                            <div class="timeline-step">
+                                <span class="step-day">Day 4-5</span>
+                                <span class="step-task">Refinements & finalization</span>
+                            </div>
+                            <div class="timeline-step">
+                                <span class="step-day">Day 5</span>
+                                <span class="step-task">Final delivery</span>
+                            </div>
+                        </div>
+                        <div class="rush-option">
+                            <i class="fas fa-bolt"></i>
+                            <span>Need it faster? Rush delivery available</span>
+                        </div>
+                    </div>
+
+                    <!-- Contact Card -->
+                    <div class="sidebar-card contact-card" data-aos="fade-up" data-aos-delay="200">
+                        <h4>Have Questions?</h4>
+                        <p>Let's discuss your project requirements and find the perfect solution for your needs.</p>
+                        
+                        <div class="contact-options">
+                            <a href="tel:+919518754011" class="contact-option">
+                                <i class="fas fa-phone"></i>
+                                <span>Call Now</span>
+                            </a>
+                            <a href="https://wa.me/919518754011?text=Hi%20Pixel%20Media,%20I'm%20interested%20in%20{{ service.name }}" target="_blank" class="contact-option">
+                                <i class="fab fa-whatsapp"></i>
+                                <span>WhatsApp</span>
+                            </a>
+                            <a href="mailto:sarveshkumbhar10@gmail.com?subject=Inquiry%20about%20{{ service.name }}" class="contact-option">
+                                <i class="fas fa-envelope"></i>
+                                <span>Email</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Related Services -->
+<section class="related-services">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+            <h2 class="section-title">You Might Also Like</h2>
+            <p class="section-description">Explore our other design services that complement {{ service.name.lower() }}</p>
+        </div>
+        
+        <div class="row">
+            <!-- This would be populated with related services in a real app -->
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up">
+                <div class="related-service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <h4>Business Cards</h4>
+                    <p>Complete your brand identity with professional business card design.</p>
+                    <a href="{{ url_for('services') }}" class="btn btn-sm btn-outline-primary">Learn More</a>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="related-service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <h4>Social Media Graphics</h4>
+                    <p>Extend your brand across social media platforms with consistent designs.</p>
+                    <a href="{{ url_for('services') }}" class="btn btn-sm btn-outline-primary">Learn More</a>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="related-service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-print"></i>
+                    </div>
+                    <h4>Print Design</h4>
+                    <p>Professional print materials including flyers, brochures, and more.</p>
+                    <a href="{{ url_for('services') }}" class="btn btn-sm btn-outline-primary">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Lightbox Modal -->
+<div class="lightbox-modal" id="lightboxModal">
+    <div class="lightbox-overlay"></div>
+    <div class="lightbox-container">
+        <button class="lightbox-close" id="lightboxClose">
+            <i class="fas fa-times"></i>
+        </button>
+        <button class="lightbox-prev" id="lightboxPrev">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="lightbox-next" id="lightboxNext">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="lightbox-content">
+            <img id="lightboxImage" src="" alt="">
+            <div class="lightbox-info">
+                <h4 id="lightboxTitle"></h4>
+                <p id="lightboxDescription"></p>
+                <div class="lightbox-meta">
+                    <span id="lightboxCounter">1 / 12</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Service to folder mapping
+const SERVICE_FOLDER_MAP = {
+    'Logo Design & Branding': 'logo',
+    'Business Card Design': 'business-card',
+    'Invitation Card Design': 'invitation-card-design',
+    'Social Media Creatives': 'social-media-post',
+    'Packaging Design': 'packaging',
+    'Flyer Design': 'flyer-design',
+    'PowerPoint Presentations': 'campaign-design',
+    'Label Design': 'label-design'
+};
+
+// Dynamic Gallery System
+class EnhancedPortfolioGallery {
+    constructor() {
+        this.currentService = '{{ service.name }}';
+        this.currentFilter = 'all';
+        this.currentImages = [];
+        this.currentIndex = 0;
+        this.imagesPerLoad = 6;
+        this.totalLoaded = 0;
+        
+        this.init();
+    }
+    
+    init() {
+        this.bindEvents();
+        this.loadImages();
+        this.initializeLightbox();
+    }
+    
+    bindEvents() {
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.handleFilter(e));
+        });
+        
+        // Load more button
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', () => this.loadMoreImages());
+        }
+    }
+    
+    async loadImages() {
+        const gallery = document.getElementById('galleryGrid');
+        const loading = gallery.querySelector('.gallery-loading');
+        
+        try {
+            const folderName = SERVICE_FOLDER_MAP[this.currentService] || 'logo';
+            const images = await this.fetchServiceImages(folderName);
+            
+            if (images && images.length > 0) {
+                this.currentImages = images;
+                this.renderImages(images.slice(0, this.imagesPerLoad));
+                this.totalLoaded = Math.min(this.imagesPerLoad, images.length);
+                
+                // Update load more button
+                this.updateLoadMoreButton();
+                
+                // Update gallery header with count
+                const sectionTitle = document.querySelector('.card-title');
+                if (sectionTitle && this.currentImages.length > 0) {
+                    sectionTitle.textContent = `${this.currentService} Portfolio (${this.currentImages.length} projects)`;
+                }
+            } else {
+                gallery.innerHTML = '<div class="no-images"><i class="fas fa-images"></i><p>Portfolio images coming soon!</p></div>';
+            }
+            
+        } catch (error) {
+            console.error('Error loading images:', error);
+            gallery.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>Error loading portfolio images</p></div>';
+        }
+        
+        if (loading) loading.remove();
+    }
+    
+    async fetchServiceImages(folderName) {
+        // Service-specific image configurations with actual file names
+        const serviceImageConfigs = {
+            'logo': {
+                images: [
+                    { file: 'devsthan-samiti.png', title: 'Devsthan Samiti Logo', client: 'Devsthan Samiti', description: 'Logo design for community organization focused on social welfare and development' },
+                    { file: 'gardenia-logo.png', title: 'Gardenia Restaurant Logo', client: 'Gardenia Restaurant', description: 'Modern restaurant branding with elegant typography and nature-inspired design' },
+                    { file: 'kedar-arts-team.png', title: 'Kedar Arts Team Logo', client: 'Kedar Arts Team', description: 'Creative agency logo design emphasizing artistic excellence and team collaboration' },
+                    { file: 'shri-swami-shikshan-sanstha.png', title: 'Educational Institution Logo', client: 'Shri Swami Shikshan Sanstha', description: 'Traditional yet modern logo for prestigious educational institution' }
+                ]
+            },
+            'business-card': {
+                images: [
+                    { file: 'miracle-card-front.png', title: 'Miracle Business Card - Front', client: 'Miracle Paws', description: 'Professional business card front design with modern layout and brand identity elements' },
+                    { file: 'miracle-card-back.png', title: 'Miracle Business Card - Back', client: 'Miracle Paws', description: 'Business card back design featuring contact details and additional brand information' }
+                ]
+            },
+            'invitation-card-design': {
+                images: [
+                    { file: 'engagement-card-1.jpg', title: 'Elegant Engagement Invitation', client: 'Private Client', description: 'Beautiful engagement ceremony invitation with traditional Indian design elements and modern elegance' },
+                    { file: 'engagement-card-2.jpg', title: 'Royal Engagement Card Design', client: 'Private Client', description: 'Luxurious engagement invitation featuring premium finishing, gold accents, and sophisticated layout' },
+                    { file: 'hotel-thalikatta.jpg', title: 'Hotel Thalikatta Event Invitation', client: 'Hotel Thalikatta', description: 'Professional event invitation design for hospitality industry with elegant typography' },
+                    { file: 'Vastu Peace.jpg', title: 'Vastu Peace Consultation Invitation', client: 'Vastu Peace', description: 'Peaceful invitation design for Vastu consultation events with calming aesthetics' }
+                ]
+            },
+            'social-media-post': {
+                images: [
+                    { file: 'Bhaubij.jpg', title: 'Bhau Beej Festival Post', client: 'Festival Campaign', description: 'Traditional Bhau Beej celebration post with vibrant colors and cultural elements' },
+                    { file: 'dhantrudshi.jpg', title: 'Dhanteras Festival Design', client: 'Festival Campaign', description: 'Dhanteras celebration post featuring gold elements and prosperity themes' },
+                    { file: 'diwali.jpg', title: 'Diwali Celebration Post', client: 'Festival Campaign', description: 'Festive Diwali design with traditional lamps, fireworks and celebration mood' },
+                    { file: 'ganesh chaturthi.jpg', title: 'Ganesh Chaturthi Special', client: 'Festival Campaign', description: 'Lord Ganesha festival post with traditional motifs and devotional design' },
+                    { file: 'independence-day.jpg', title: 'Independence Day Celebration', client: 'Patriotic Campaign', description: 'National pride post featuring tricolor and freedom celebration theme' },
+                    { file: 'mehndi desing flyer.jpg', title: 'Mehndi Design Service', client: 'Beauty Service', description: 'Promotional post for professional mehndi/henna design services' },
+                    { file: 'rakshabandhan.jpg', title: 'Raksha Bandhan Festival', client: 'Festival Campaign', description: 'Brother-sister bond celebration with traditional rakhi and festive elements' },
+                    { file: 'womens-day.jpg', title: 'Women\'s Day Special', client: 'Social Campaign', description: 'Empowering Women\'s Day post celebrating female strength and achievements' }
+                ]
+            },
+            'packaging': {
+                images: [
+                    { file: '1-suhana-biryani-masala.png', title: 'Suhana Biryani Masala Package', client: 'Suhana Brand', description: 'Premium spice packaging design with appetizing food imagery and brand colors' },
+                    { file: '2-Haldiram-namkeep.png', title: 'Haldiram Namkeen Package', client: 'Haldiram\'s', description: 'Traditional snack packaging maintaining brand heritage with modern appeal' },
+                    { file: '3-almonds-pack.png', title: 'Premium Almonds Package', client: 'Dry Fruits Brand', description: 'Elegant nuts packaging emphasizing premium quality and health benefits' },
+                    { file: '4-doritos-brown-rice-chips.png', title: 'Doritos Brown Rice Chips', client: 'Doritos', description: 'Healthy snack packaging variant with natural ingredients emphasis' }
+                ]
+            },
+            'flyer-design': {
+                images: [
+                    { file: '1-malabar.jpg', title: 'Malabar Jewelry Collection', client: 'Malabar Gold & Diamonds', description: 'Premium jewelry brand promotional design showcasing exquisite gold and diamond collections' },
+                    { file: '2-kerala-tour.jpg', title: 'Kerala Tour Package', client: 'Travel Agency', description: 'God\'s Own Country tour package flyer showcasing Kerala\'s natural beauty' },
+                    { file: '3-cakevilla.png', title: 'Cake Villa Bakery Flyer', client: 'Cake Villa', description: 'Delicious bakery promotional material featuring cakes and sweet treats' },
+                    { file: '4-pet-shop.png', title: 'Pet Shop Business Flyer', client: 'Pet Care Store', description: 'Pet supplies and care services flyer with cute animal illustrations' },
+                    { file: '5-Tathatuse-monsoon-sale.png', title: 'Monsoon Sale Promotion', client: 'Retail Brand', description: 'Seasonal sale flyer with monsoon theme and attractive discount offers' },
+                    { file: '6-goa-tour-package.png', title: 'Goa Tour Package', client: 'Travel Company', description: 'Beach destination tour flyer featuring Goa\'s scenic beauty and attractions' }
+                ]
+            },
+            'campaign-design': {
+                images: [
+                    { file: 'child-labour-book.png', title: 'Child Labour Awareness - Education', client: 'Social Campaign', description: 'Social awareness campaign promoting education over child labor' },
+                    { file: 'child-labour-future.png', title: 'Child Labour - Future Rights', client: 'Social Campaign', description: 'Campaign highlighting children\'s right to a better future through education' },
+                    { file: 'child-labour-lost-childhood.png', title: 'Lost Childhood Campaign', client: 'NGO Campaign', description: 'Emotional awareness campaign about children losing their childhood to labor' },
+                    { file: 'child-labour-play.png', title: 'Children\'s Right to Play', client: 'Child Rights Campaign', description: 'Campaign promoting children\'s fundamental right to play and enjoy childhood' },
+                    { file: 'fort-conservation-google-image.png', title: 'Heritage Conservation Campaign', client: 'Cultural Preservation', description: 'Heritage fort conservation awareness campaign for historical preservation' }
+                ]
+            },
+            'label-design': {
+                images: [
+                    { file: 'label design.jpg', title: 'Professional Label Design Collection', client: 'Various Brands', description: 'Comprehensive label design showcase featuring various product labels with modern branding approaches' }
+                ]
+            }
+        };
+
+        const config = serviceImageConfigs[folderName] || serviceImageConfigs['logo'];
+        const images = [];
+        
+        config.images.forEach((imageData, i) => {
+            images.push({
+                src: `/static/images/${folderName}/${imageData.file}`,
+                title: imageData.title,
+                description: imageData.description,
+                client: imageData.client,
+                category: i < Math.floor(config.images.length * 0.4) ? 'recent' : 
+                         (i < Math.floor(config.images.length * 0.7) ? 'featured' : 'all'),
+                index: i
+            });
+        });
+        
+        return images;
+    }
+    
+    renderImages(images) {
+        const gallery = document.getElementById('galleryGrid');
+        
+        images.forEach((image, index) => {
+            const item = document.createElement('div');
+            item.className = 'gallery-item';
+            item.innerHTML = `
+                <div class="gallery-image">
+                    <img src="${image.src}" alt="${image.title}" loading="lazy" 
+                         onerror="this.src='/static/images/placeholder-portfolio.jpg'; this.parentElement.parentElement.style.opacity='0.7';">
+                    <div class="gallery-overlay">
+                        <div class="gallery-actions">
+                            <button class="gallery-action-btn" onclick="portfolioGallery.openLightbox(${this.totalLoaded + index})">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                            <button class="gallery-action-btn">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="gallery-info">
+                            <h5>${image.title}</h5>
+                            <p class="gallery-client">Client: ${image.client}</p>
+                            <p class="gallery-description">${image.description}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add staggered animation
+            item.style.animationDelay = `${index * 100}ms`;
+            gallery.appendChild(item);
+        });
+        
+        // Trigger masonry layout
+        this.refreshMasonry();
+    }
+    
+    loadMoreImages() {
+        const remainingImages = this.currentImages.slice(this.totalLoaded, this.totalLoaded + this.imagesPerLoad);
+        if (remainingImages.length > 0) {
+            this.renderImages(remainingImages);
+            this.totalLoaded += remainingImages.length;
+            this.updateLoadMoreButton();
+        }
+    }
+    
+    updateLoadMoreButton() {
+        const btn = document.getElementById('loadMoreBtn');
+        if (btn) {
+            if (this.totalLoaded >= this.currentImages.length) {
+                btn.style.display = 'none';
+            } else {
+                btn.innerHTML = `<i class="fas fa-plus me-2"></i>Load More (${this.currentImages.length - this.totalLoaded} remaining)`;
+            }
+        }
+    }
+    
+    handleFilter(e) {
+        const filter = e.target.dataset.filter;
+        
+        // Update active state
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        
+        // Filter and re-render images
+        this.currentFilter = filter;
+        let filteredImages = this.currentImages;
+        
+        if (filter !== 'all') {
+            filteredImages = this.currentImages.filter(img => img.category === filter);
+        }
+        
+        // Clear gallery and re-render
+        const gallery = document.getElementById('galleryGrid');
+        gallery.innerHTML = '';
+        this.renderImages(filteredImages.slice(0, this.imagesPerLoad));
+        this.totalLoaded = Math.min(this.imagesPerLoad, filteredImages.length);
+        this.updateLoadMoreButton();
+    }
+    
+    refreshMasonry() {
+        // Simple masonry-like layout using CSS Grid
+        const gallery = document.getElementById('galleryGrid');
+        gallery.style.display = 'grid';
+        gallery.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
+        gallery.style.gap = '20px';
+    }
+    
+    // Lightbox functionality
+    initializeLightbox() {
+        const modal = document.getElementById('lightboxModal');
+        const closeBtn = document.getElementById('lightboxClose');
+        const prevBtn = document.getElementById('lightboxPrev');
+        const nextBtn = document.getElementById('lightboxNext');
+        const overlay = modal.querySelector('.lightbox-overlay');
+        
+        closeBtn.addEventListener('click', () => this.closeLightbox());
+        overlay.addEventListener('click', () => this.closeLightbox());
+        prevBtn.addEventListener('click', () => this.navigateLightbox(-1));
+        nextBtn.addEventListener('click', () => this.navigateLightbox(1));
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (modal.classList.contains('active')) {
+                if (e.key === 'Escape') this.closeLightbox();
+                if (e.key === 'ArrowLeft') this.navigateLightbox(-1);
+                if (e.key === 'ArrowRight') this.navigateLightbox(1);
+            }
+        });
+    }
+    
+    openLightbox(index) {
+        if (this.currentImages.length === 0) return;
+        
+        this.currentIndex = index;
+        const modal = document.getElementById('lightboxModal');
+        const image = document.getElementById('lightboxImage');
+        const title = document.getElementById('lightboxTitle');
+        const description = document.getElementById('lightboxDescription');
+        const counter = document.getElementById('lightboxCounter');
+        
+        const currentImage = this.currentImages[index];
+        
+        image.src = currentImage.src;
+        title.textContent = currentImage.title;
+        description.textContent = currentImage.description;
+        counter.textContent = `${index + 1} / ${this.currentImages.length}`;
+        
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    closeLightbox() {
+        const modal = document.getElementById('lightboxModal');
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    navigateLightbox(direction) {
+        this.currentIndex += direction;
+        
+        if (this.currentIndex < 0) {
+            this.currentIndex = this.currentImages.length - 1;
+        } else if (this.currentIndex >= this.currentImages.length) {
+            this.currentIndex = 0;
+        }
+        
+        this.openLightbox(this.currentIndex);
+    }
+}
+
+// Initialize gallery when page loads
+let portfolioGallery;
+document.addEventListener('DOMContentLoaded', function() {
+    portfolioGallery = new EnhancedPortfolioGallery();
+});
+</script>
+{% endblock %}

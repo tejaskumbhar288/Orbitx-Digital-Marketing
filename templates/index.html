@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+
+{% block title %}Pixel Media Design - Professional Digital Marketing Solutions{% endblock %}
+
+{% block meta_description %}Transform your brand with professional design services. Logo design, branding, social media creatives, packaging design and more. 500+ successful projects delivered.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-background">
+        <div class="gradient-overlay"></div>
+    </div>
+    <div class="container">
+        <div class="row align-items-center" style="min-height: 70vh;">
+            <div class="col-lg-4 col-xl-3">
+                <div class="hero-content-compact" data-aos="fade-right">
+                    <h1 class="hero-title-compact">
+                        Creative Design Solutions
+                        <span class="gradient-text">That Drive Results</span>
+                    </h1>
+                    <p class="hero-description-compact">
+                        Transform your brand with professional design services.
+                    </p>
+
+                    <!-- Compact CTA Buttons -->
+                    <div class="hero-cta-compact">
+                        <a href="{{ url_for('quote') }}" class="btn btn-primary btn-sm w-100">
+                            <i class="fas fa-rocket me-2"></i>Start Project
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 col-xl-9">
+                <div class="hero-visual-wide" data-aos="fade-left" data-aos-delay="200">
+                    <!-- Wide space for background image to dominate -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator">
+        <div class="scroll-arrow"></div>
+        <span>Scroll to explore</span>
+    </div>
+</section>
+
+<!-- Services At A Glance -->
+<section class="services-preview">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+            <h2 class="section-title">Services That <span class="gradient-text">Drive Success</span></h2>
+            <p class="section-description">
+                Comprehensive design solutions tailored to elevate your brand and achieve your business goals.
+            </p>
+        </div>
+        
+        <div class="row">
+            {% for service in services[:6] %}
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="{{ service.icon_class }}"></i>
+                    </div>
+                    <div class="service-content">
+                        <h3 class="service-title">{{ service.name }}</h3>
+                        <p class="service-description">{{ service.short_description }}</p>
+                        <div class="service-price">
+                            <span class="price-label">Starting from</span>
+                            <span class="price-value">{{ service.price_range.split(' - ')[0] if service.price_range else '₹Contact' }}</span>
+                        </div>
+                        <a href="{{ url_for('service_detail', service_id=service.id) }}" class="service-link">
+                            Learn More <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-5" data-aos="fade-up">
+            <a href="{{ url_for('services') }}" class="btn btn-outline-primary btn-lg">
+                View All Services <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Results-Driven Approach -->
+<section class="approach-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="approach-content">
+                    <h2 class="section-title">
+                        Our Results-Driven 
+                        <span class="gradient-text">Design Process</span>
+                    </h2>
+                    <p class="section-description">
+                        We don't just create beautiful designs – we craft strategic solutions that deliver measurable results 
+                        for your business. Every project is backed by data and designed for success.
+                    </p>
+                    
+                    <div class="process-stats">
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h4>3x Average ROI</h4>
+                                <p>Our designs deliver measurable returns on investment</p>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h4>48h Turnaround</h4>
+                                <p>Fast delivery without compromising quality</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="process-steps">
+                    <div class="step-item" data-aos="fade-up" data-aos-delay="100">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Discovery & Strategy</h4>
+                            <p>Understanding your brand, goals, and target audience to create the perfect design strategy.</p>
+                        </div>
+                    </div>
+                    <div class="step-item" data-aos="fade-up" data-aos-delay="200">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Creative Development</h4>
+                            <p>Bringing concepts to life with innovative designs that align with your brand vision.</p>
+                        </div>
+                    </div>
+                    <div class="step-item" data-aos="fade-up" data-aos-delay="300">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Refinement & Delivery</h4>
+                            <p>Perfecting every detail and delivering high-quality files ready for immediate use.</p>
+                        </div>
+                    </div>
+                    <div class="step-item" data-aos="fade-up" data-aos-delay="400">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Success Measurement</h4>
+                            <p>Tracking performance and ensuring your design investment delivers real results.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Portfolio -->
+{% if portfolio %}
+<section class="featured-portfolio">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+            <h2 class="section-title">Recent <span class="gradient-text">Success Stories</span></h2>
+            <p class="section-description">
+                See how we've helped businesses like yours achieve their design goals and drive real results.
+            </p>
+        </div>
+        
+        <div class="row">
+            {% for item in portfolio %}
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                <div class="portfolio-card">
+                    <div class="portfolio-image">
+                        <img src="{{ item.image_url or '/static/images/placeholder-portfolio.jpg' }}" alt="{{ item.title }}">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-actions">
+                                <a href="#" class="btn btn-light btn-sm portfolio-preview" data-bs-toggle="modal" data-bs-target="#portfolioModal">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('portfolio') }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h4 class="portfolio-title">{{ item.title }}</h4>
+                        <p class="portfolio-client">{{ item.client_name }}</p>
+                        <span class="portfolio-category">{{ item.service.name }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-5" data-aos="fade-up">
+            <a href="{{ url_for('portfolio') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-images me-2"></i>View Full Portfolio
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Client Testimonials -->
+{% if testimonials %}
+<section class="testimonials-section">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+            <h2 class="section-title">What Our <span class="gradient-text">Clients Say</span></h2>
+            <p class="section-description">
+                Don't just take our word for it – hear from the businesses we've helped grow and succeed.
+            </p>
+        </div>
+        
+        <div class="row">
+            {% for testimonial in testimonials %}
+            <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        {% for i in range(testimonial.rating) %}
+                        <i class="fas fa-star"></i>
+                        {% endfor %}
+                    </div>
+                    <p class="testimonial-text">"{{ testimonial.testimonial_text }}"</p>
+                    <div class="testimonial-author">
+                        <div class="author-info">
+                            <h5 class="author-name">{{ testimonial.client_name }}</h5>
+                            <p class="author-company">{{ testimonial.company }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Lead Magnet Section -->
+<section class="lead-magnet-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="lead-magnet-content">
+                    <h2 class="section-title">
+                        Get Your Free 
+                        <span class="gradient-text">2025 Design Trends Guide</span>
+                    </h2>
+                    <p class="section-description">
+                        Stay ahead of the competition with our comprehensive guide to the latest design trends, 
+                        color palettes, typography, and best practices for 2025.
+                    </p>
+                    
+                    <div class="guide-benefits">
+                        <div class="benefit-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Latest design trends and predictions</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Color palette recommendations</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Typography and layout best practices</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Industry-specific design tips</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="lead-magnet-form">
+                    <div class="form-container">
+                        <h3>Download Your Free Guide</h3>
+                        <form class="newsletter-signup">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Your Full Name" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" class="form-control" placeholder="Your Email Address" required>
+                            </div>
+                            <div class="form-group">
+                                <select class="form-control">
+                                    <option value="">Your Business Type</option>
+                                    <option value="startup">Startup</option>
+                                    <option value="small-business">Small Business</option>
+                                    <option value="agency">Agency</option>
+                                    <option value="freelancer">Freelancer</option>
+                                    <option value="enterprise">Enterprise</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-download me-2"></i>Download Free Guide
+                            </button>
+                            <p class="form-disclaimer">
+                                <small>We respect your privacy. No spam, ever. Unsubscribe at any time.</small>
+                            </p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA Section -->
+<section class="final-cta">
+    <div class="container">
+        <div class="cta-content text-center" data-aos="fade-up">
+            <h2 class="cta-title">
+                Ready to Transform Your Brand?
+            </h2>
+            <p class="cta-description">
+                Join 200+ successful businesses who trust us with their design needs. 
+                Let's create something amazing together.
+            </p>
+            
+            <div class="cta-buttons">
+                <a href="{{ url_for('quote') }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-rocket me-2"></i>Start Your Project
+                </a>
+                <a href="{{ url_for('contact') }}" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-phone me-2"></i>Schedule a Call
+                </a>
+            </div>
+            
+            <!-- Urgency Element -->
+            <div class="urgency-banner">
+                <i class="fas fa-clock me-2"></i>
+                <span>Limited slots available this month - Book your project today!</span>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

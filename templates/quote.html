@@ -1,0 +1,616 @@
+{% extends "base.html" %}
+
+{% block title %}Request a Quote - Get Your Design Project Estimate | Pixel Media Design{% endblock %}
+
+{% block meta_description %}Get a detailed quote for your design project. Professional estimates for logo design, branding, social media graphics, packaging and more. Free consultation included.{% endblock %}
+
+{% block content %}
+<!-- Quote Hero -->
+<section class="quote-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content" data-aos="fade-up">
+                    <h1 class="hero-title">
+                        Get Your Custom
+                        <span class="gradient-text">Project Quote</span>
+                    </h1>
+                    <p class="hero-description">
+                        Ready to bring your design vision to life? Fill out our detailed quote form and receive 
+                        a comprehensive project estimate within 24 hours, including timeline and deliverables.
+                    </p>
+                    
+                    <div class="quote-benefits">
+                        <div class="benefit-item">
+                            <i class="fas fa-clock"></i>
+                            <span>24-hour response time</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-calculator"></i>
+                            <span>Detailed cost breakdown</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-phone"></i>
+                            <span>Free consultation included</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="quote-visual" data-aos="fade-left">
+                    <div class="quote-illustration">
+                        <div class="quote-steps">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <span>Fill Form</span>
+                            </div>
+                            <div class="step-arrow">→</div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <span>Get Quote</span>
+                            </div>
+                            <div class="step-arrow">→</div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <span>Start Project</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quote Form -->
+<section class="quote-form-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="quote-form-container" data-aos="fade-up">
+                    <div class="form-header">
+                        <h2>Project Details</h2>
+                        <p>The more details you provide, the more accurate your quote will be.</p>
+                    </div>
+                    
+                    <form method="POST" enctype="multipart/form-data" class="quote-form">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Step 1: Basic Information -->
+                        <div class="form-step active" id="step1">
+                            <div class="step-header">
+                                <h3><span class="step-number">1</span> Basic Information</h3>
+                                <p>Let's start with your contact details</p>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.client_name.label(class="form-label") }}
+                                        {{ form.client_name(class="form-control" + (" is-invalid" if form.client_name.errors else "")) }}
+                                        {% if form.client_name.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.client_name.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.email.label(class="form-label") }}
+                                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                                        {% if form.email.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.email.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.phone.label(class="form-label") }}
+                                        {{ form.phone(class="form-control") }}
+                                        <small class="form-text text-muted">For quick communication about your project</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.company_name.label(class="form-label") }}
+                                        {{ form.company_name(class="form-control") }}
+                                        <small class="form-text text-muted">Optional - your business name</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-navigation">
+                                <button type="button" class="btn btn-primary next-step">
+                                    Next: Select Services <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2: Service Selection -->
+                        <div class="form-step" id="step2">
+                            <div class="step-header">
+                                <h3><span class="step-number">2</span> Service Selection</h3>
+                                <p>What type of design services do you need?</p>
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.services_requested.label(class="form-label") }}
+                                <div class="services-grid">
+                                    {% for subfield in form.services_requested %}
+                                    <div class="service-option">
+                                        {{ subfield(class="service-checkbox") }}
+                                        {{ subfield.label(class="service-label") }}
+                                        <div class="service-description">
+                                            {% if 'Logo' in subfield.label.text %}
+                                                Complete brand identity including logo, colors, and guidelines
+                                            {% elif 'Business Card' in subfield.label.text %}
+                                                Professional business card design with premium layouts
+                                            {% elif 'Social Media' in subfield.label.text %}
+                                                Instagram, Facebook, LinkedIn post designs and templates
+                                            {% elif 'Packaging' in subfield.label.text %}
+                                                Product packaging design with 3D mockups
+                                            {% elif 'Flyer' in subfield.label.text %}
+                                                Marketing flyers and promotional materials
+                                            {% elif 'PowerPoint' in subfield.label.text %}
+                                                Professional presentation slides and templates
+                                            {% else %}
+                                                Professional design services tailored to your needs
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% if form.services_requested.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.services_requested.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="step-navigation">
+                                <button type="button" class="btn btn-outline-secondary prev-step">
+                                    <i class="fas fa-arrow-left me-2"></i> Back
+                                </button>
+                                <button type="button" class="btn btn-primary next-step">
+                                    Next: Project Details <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3: Project Details -->
+                        <div class="form-step" id="step3">
+                            <div class="step-header">
+                                <h3><span class="step-number">3</span> Project Details</h3>
+                                <p>Tell us more about your project requirements</p>
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.project_description.label(class="form-label") }}
+                                {{ form.project_description(class="form-control" + (" is-invalid" if form.project_description.errors else "")) }}
+                                {% if form.project_description.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.project_description.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">Describe your vision, target audience, style preferences, and any specific requirements</small>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.budget_range.label(class="form-label") }}
+                                        {{ form.budget_range(class="form-control" + (" is-invalid" if form.budget_range.errors else "")) }}
+                                        {% if form.budget_range.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.budget_range.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.timeline.label(class="form-label") }}
+                                        {{ form.timeline(class="form-control" + (" is-invalid" if form.timeline.errors else "")) }}
+                                        {% if form.timeline.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.timeline.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.additional_requirements.label(class="form-label") }}
+                                {{ form.additional_requirements(class="form-control") }}
+                                <small class="form-text text-muted">Any additional information, special requests, or files you'd like to share</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.reference_files.label(class="form-label") }}
+                                {{ form.reference_files(class="form-control") }}
+                                <small class="form-text text-muted">Upload inspiration images, current designs, or reference materials (Max 16MB)</small>
+                            </div>
+                            
+                            <div class="step-navigation">
+                                <button type="button" class="btn btn-outline-secondary prev-step">
+                                    <i class="fas fa-arrow-left me-2"></i> Back
+                                </button>
+                                <button type="button" class="btn btn-primary next-step">
+                                    Review & Submit <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 4: Review & Submit -->
+                        <div class="form-step" id="step4">
+                            <div class="step-header">
+                                <h3><span class="step-number">4</span> Review & Submit</h3>
+                                <p>Please review your information before submitting</p>
+                            </div>
+                            
+                            <div class="quote-summary" id="quoteSummary">
+                                <!-- Summary will be populated by JavaScript -->
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="agreementCheck" required>
+                                    <label class="form-check-label" for="agreementCheck">
+                                        I agree to the terms and conditions and understand that this quote is an estimate. 
+                                        Final pricing may vary based on project scope discussions.
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="step-navigation">
+                                <button type="button" class="btn btn-outline-secondary prev-step">
+                                    <i class="fas fa-arrow-left me-2"></i> Back
+                                </button>
+                                {{ form.submit(class="btn btn-success btn-lg") }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="quote-sidebar">
+                    <!-- Progress Card -->
+                    <div class="sidebar-card progress-card" data-aos="fade-up">
+                        <h4>Quote Progress</h4>
+                        <div class="progress-steps">
+                            <div class="progress-step active" data-step="1">
+                                <div class="step-circle">1</div>
+                                <span>Basic Info</span>
+                            </div>
+                            <div class="progress-step" data-step="2">
+                                <div class="step-circle">2</div>
+                                <span>Services</span>
+                            </div>
+                            <div class="progress-step" data-step="3">
+                                <div class="step-circle">3</div>
+                                <span>Details</span>
+                            </div>
+                            <div class="progress-step" data-step="4">
+                                <div class="step-circle">4</div>
+                                <span>Review</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pricing Guide -->
+                    <div class="sidebar-card pricing-guide" data-aos="fade-up" data-aos-delay="100">
+                        <h4>Pricing Guide</h4>
+                        <div class="pricing-list">
+                            <div class="pricing-item">
+                                <span class="service">Logo Design</span>
+                                <span class="price">₹5,000+</span>
+                            </div>
+                            <div class="pricing-item">
+                                <span class="service">Business Cards</span>
+                                <span class="price">₹2,000+</span>
+                            </div>
+                            <div class="pricing-item">
+                                <span class="service">Social Media Kit</span>
+                                <span class="price">₹3,000+</span>
+                            </div>
+                            <div class="pricing-item">
+                                <span class="service">Packaging Design</span>
+                                <span class="price">₹10,000+</span>
+                            </div>
+                            <div class="pricing-item">
+                                <span class="service">Complete Branding</span>
+                                <span class="price">₹25,000+</span>
+                            </div>
+                        </div>
+                        <div class="pricing-note">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Final pricing depends on project complexity and requirements</span>
+                        </div>
+                    </div>
+                    
+                    <!-- What's Included -->
+                    <div class="sidebar-card whats-included" data-aos="fade-up" data-aos-delay="200">
+                        <h4>What's Included</h4>
+                        <ul class="included-list">
+                            <li><i class="fas fa-check"></i> Initial consultation call</li>
+                            <li><i class="fas fa-check"></i> Custom design concepts</li>
+                            <li><i class="fas fa-check"></i> Unlimited revisions</li>
+                            <li><i class="fas fa-check"></i> Multiple file formats</li>
+                            <li><i class="fas fa-check"></i> Commercial usage rights</li>
+                            <li><i class="fas fa-check"></i> 30-day support</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Contact Info -->
+                    <div class="sidebar-card contact-info" data-aos="fade-up" data-aos-delay="300">
+                        <h4>Need Help?</h4>
+                        <p>Have questions about the quote form or your project?</p>
+                        
+                        <div class="contact-options">
+                            <a href="tel:+919518754011" class="contact-btn">
+                                <i class="fas fa-phone"></i> Call Now
+                            </a>
+                            <a href="https://wa.me/919518754011?text=Hi%20Pixel%20Media,%20I%20need%20help%20with%20my%20quote%20request" target="_blank" class="contact-btn">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Success Message -->
+<div class="quote-success d-none" id="quoteSuccess">
+    <div class="container">
+        <div class="success-content text-center">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Quote Request Submitted!</h2>
+            <p>Thank you for your detailed information. I'll review your project and send you a comprehensive quote within 24 hours.</p>
+            
+            <div class="next-steps">
+                <h4>What happens next?</h4>
+                <div class="steps-list">
+                    <div class="step">
+                        <i class="fas fa-search"></i>
+                        <span>I'll review your project details</span>
+                    </div>
+                    <div class="step">
+                        <i class="fas fa-calculator"></i>
+                        <span>Prepare a detailed quote with timeline</span>
+                    </div>
+                    <div class="step">
+                        <i class="fas fa-envelope"></i>
+                        <span>Send you the quote via email</span>
+                    </div>
+                    <div class="step">
+                        <i class="fas fa-phone"></i>
+                        <span>Schedule a call to discuss details</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="success-actions">
+                <a href="{{ url_for('portfolio') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-images me-2"></i>View My Work
+                </a>
+                <a href="{{ url_for('contact') }}" class="btn btn-primary">
+                    <i class="fas fa-phone me-2"></i>Contact Me
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Multi-step form functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.quote-form');
+    const steps = document.querySelectorAll('.form-step');
+    const progressSteps = document.querySelectorAll('.progress-step');
+    const nextBtns = document.querySelectorAll('.next-step');
+    const prevBtns = document.querySelectorAll('.prev-step');
+    let currentStep = 1;
+    
+    // Navigation functions
+    function showStep(stepNumber) {
+        steps.forEach(step => step.classList.remove('active'));
+        progressSteps.forEach(step => step.classList.remove('active'));
+        
+        document.getElementById(`step${stepNumber}`).classList.add('active');
+        document.querySelector(`.progress-step[data-step="${stepNumber}"]`).classList.add('active');
+        
+        // Mark previous steps as completed
+        progressSteps.forEach(step => {
+            const stepNum = parseInt(step.dataset.step);
+            if (stepNum < stepNumber) {
+                step.classList.add('completed');
+            } else {
+                step.classList.remove('completed');
+            }
+        });
+        
+        currentStep = stepNumber;
+        
+        // Update summary on review step
+        if (stepNumber === 4) {
+            updateQuoteSummary();
+        }
+    }
+    
+    function validateStep(stepNumber) {
+        const step = document.getElementById(`step${stepNumber}`);
+        const requiredFields = step.querySelectorAll('[required]');
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        // Special validation for step 2 (services)
+        if (stepNumber === 2) {
+            const checkboxes = step.querySelectorAll('input[type="checkbox"]');
+            const isAnyChecked = Array.from(checkboxes).some(cb => cb.checked);
+            if (!isAnyChecked) {
+                isValid = false;
+                // Show error message
+                const errorDiv = step.querySelector('.invalid-feedback') || document.createElement('div');
+                errorDiv.className = 'invalid-feedback d-block';
+                errorDiv.textContent = 'Please select at least one service';
+                const servicesGrid = step.querySelector('.services-grid');
+                if (!step.querySelector('.invalid-feedback')) {
+                    servicesGrid.parentNode.appendChild(errorDiv);
+                }
+            } else {
+                const errorDiv = step.querySelector('.invalid-feedback');
+                if (errorDiv) errorDiv.remove();
+            }
+        }
+        
+        return isValid;
+    }
+    
+    // Next button handlers
+    nextBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (validateStep(currentStep)) {
+                showStep(currentStep + 1);
+            }
+        });
+    });
+    
+    // Previous button handlers
+    prevBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            showStep(currentStep - 1);
+        });
+    });
+    
+    // Update quote summary
+    function updateQuoteSummary() {
+        const summary = document.getElementById('quoteSummary');
+        const formData = new FormData(form);
+        
+        let html = '<div class="summary-sections">';
+        
+        // Basic Info
+        html += '<div class="summary-section">';
+        html += '<h5><i class="fas fa-user"></i> Contact Information</h5>';
+        html += `<p><strong>Name:</strong> ${formData.get('client_name') || 'Not provided'}</p>`;
+        html += `<p><strong>Email:</strong> ${formData.get('email') || 'Not provided'}</p>`;
+        if (formData.get('phone')) {
+            html += `<p><strong>Phone:</strong> ${formData.get('phone')}</p>`;
+        }
+        if (formData.get('company_name')) {
+            html += `<p><strong>Company:</strong> ${formData.get('company_name')}</p>`;
+        }
+        html += '</div>';
+        
+        // Services
+        html += '<div class="summary-section">';
+        html += '<h5><i class="fas fa-list"></i> Selected Services</h5>';
+        const services = formData.getAll('services_requested');
+        if (services.length > 0) {
+            html += '<ul>';
+            services.forEach(service => {
+                html += `<li>${service}</li>`;
+            });
+            html += '</ul>';
+        } else {
+            html += '<p>No services selected</p>';
+        }
+        html += '</div>';
+        
+        // Project Details
+        html += '<div class="summary-section">';
+        html += '<h5><i class="fas fa-info-circle"></i> Project Details</h5>';
+        if (formData.get('project_description')) {
+            html += `<p><strong>Description:</strong> ${formData.get('project_description').substring(0, 200)}${formData.get('project_description').length > 200 ? '...' : ''}</p>`;
+        }
+        if (formData.get('budget_range')) {
+            html += `<p><strong>Budget:</strong> ${formData.get('budget_range')}</p>`;
+        }
+        if (formData.get('timeline')) {
+            html += `<p><strong>Timeline:</strong> ${formData.get('timeline')}</p>`;
+        }
+        html += '</div>';
+        
+        html += '</div>';
+        
+        summary.innerHTML = html;
+    }
+    
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!document.getElementById('agreementCheck').checked) {
+            alert('Please agree to the terms and conditions');
+            return;
+        }
+        
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting Quote Request...';
+        submitBtn.disabled = true;
+        
+        // Simulate form submission (replace with actual submission)
+        setTimeout(() => {
+            document.querySelector('.quote-form-section').style.display = 'none';
+            document.getElementById('quoteSuccess').classList.remove('d-none');
+            window.scrollTo(0, 0);
+        }, 2000);
+    });
+    
+    // Service selection enhancements
+    document.querySelectorAll('.service-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const serviceOption = this.closest('.service-option');
+            if (this.checked) {
+                serviceOption.classList.add('selected');
+            } else {
+                serviceOption.classList.remove('selected');
+            }
+        });
+    });
+    
+    // File upload preview
+    const fileInput = document.querySelector('input[type="file"]');
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            const files = Array.from(this.files);
+            if (files.length > 0) {
+                const fileList = files.map(file => `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`).join(', ');
+                const preview = document.createElement('small');
+                preview.className = 'form-text text-success';
+                preview.innerHTML = `<i class="fas fa-check"></i> Selected: ${fileList}`;
+                
+                const existingPreview = this.parentNode.querySelector('.text-success');
+                if (existingPreview) {
+                    existingPreview.remove();
+                }
+                this.parentNode.appendChild(preview);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

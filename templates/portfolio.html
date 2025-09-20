@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Portfolio - Our Best Design Work | Pixel Media Design{% endblock %}
+
+{% block meta_description %}Explore our portfolio of professional design work including logos, branding, social media graphics, packaging design and more. 500+ successful projects.{% endblock %}
+
+{% block content %}
+<!-- Portfolio Hero -->
+<section class="portfolio-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content" data-aos="fade-up">
+                    <h1 class="hero-title">
+                        Our <span class="gradient-text">Creative Portfolio</span>
+                    </h1>
+                    <p class="hero-description">
+                        Discover how we've helped businesses across industries create stunning visual identities
+                        and achieve their marketing goals through strategic design.
+                    </p>
+
+                    <div class="portfolio-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">500+</span>
+                            <span class="stat-label">Projects Completed</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">200+</span>
+                            <span class="stat-label">Happy Clients</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">15+</span>
+                            <span class="stat-label">Industries Served</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-visual" data-aos="fade-left">
+                    <div class="portfolio-preview">
+                        <div class="preview-grid">
+                            <div class="preview-item item-1"></div>
+                            <div class="preview-item item-2"></div>
+                            <div class="preview-item item-3"></div>
+                            <div class="preview-item item-4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Portfolio Filters -->
+<section class="portfolio-filters">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="filter-container" data-aos="fade-up">
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="*">All Projects</button>
+                        {% for service in services %}
+                        <button class="filter-btn" data-filter=".service-{{ service.id }}">{{ service.name }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Portfolio Grid -->
+<section class="portfolio-grid-section" id="gridView">
+    <div class="container">
+        <div class="portfolio-grid" id="portfolioGrid">
+            {% for item in portfolio_items %}
+            <div class="portfolio-item service-{{ item.service_id }}" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                <div class="portfolio-card">
+                    <div class="portfolio-image">
+                        <img src="{{ item.image_url or url_for('static', filename='images/placeholder-portfolio.jpg') }}"
+                             alt="{{ item.title }}"
+                             loading="lazy">
+                        <div class="portfolio-overlay">
+                            <div class="overlay-content">
+                                <h4 class="portfolio-title">{{ item.title }}</h4>
+                                <p class="portfolio-client">{{ item.client_name }}</p>
+                                <div class="portfolio-tags">
+                                    {% for tag in item.get_tags_list() %}
+                                    <span class="tag">{{ tag }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="portfolio-actions">
+                                    <button class="btn btn-light btn-sm" onclick="openPortfolioModal({{ item.id }})">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                    <a href="{{ url_for('service_detail', service_id=item.service_id) }}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-arrow-right"></i> Service
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-info">
+                        <div class="info-top">
+                            <h5 class="portfolio-title">{{ item.title }}</h5>
+                            <span class="portfolio-category">{{ item.service.name }}</span>
+                        </div>
+                        <p class="portfolio-client">{{ item.client_name }}</p>
+                        {% if item.project_date %}
+                        <small class="portfolio-date">{{ item.project_date.strftime('%B %Y') }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Show message if no items -->
+            {% if not portfolio_items %}
+            <div class="col-12">
+                <div class="no-results">
+                    <i class="fas fa-search"></i>
+                    <h4>No projects found</h4>
+                    <p>Try adjusting your filters or search terms.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Portfolio Count -->
+        {% if portfolio_items %}
+        <div class="portfolio-pagination" data-aos="fade-up">
+            <div class="pagination-info text-center">
+                <span>Showing {{ portfolio_items|length }} projects</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="portfolio-cta">
+    <div class="container">
+        <div class="cta-content text-center" data-aos="fade-up">
+            <h2 class="cta-title">
+                Ready to Create Your Next
+                <span class="gradient-text">Success Story?</span>
+            </h2>
+            <p class="cta-description">
+                Join the growing list of successful businesses who trust us with their design needs.
+                Let's bring your vision to life with professional, results-driven design.
+            </p>
+
+            <div class="cta-buttons">
+                <a href="{{ url_for('quote') }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-rocket me-2"></i>Start Your Project
+                </a>
+                <a href="{{ url_for('contact') }}" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-phone me-2"></i>Let's Discuss
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Portfolio functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const portfolioItems = document.querySelectorAll('.portfolio-item');
+
+    // Filter functionality
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+
+            // Update active button
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            // Filter grid items
+            portfolioItems.forEach(item => {
+                if (filter === '*' || item.classList.contains(filter.substring(1))) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+
+// Portfolio modal functionality
+function openPortfolioModal(itemId) {
+    alert('Portfolio modal functionality would be implemented here. Item ID: ' + itemId);
+}
+</script>
+{% endblock %}

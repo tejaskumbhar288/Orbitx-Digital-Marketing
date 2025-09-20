@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+
+{% block title %}Professional Design Services - Pixel Media Design{% endblock %}
+
+{% block meta_description %}Comprehensive design services including logo design, branding, social media creatives, packaging design, presentations and more. Professional quality, competitive pricing.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="page-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content" data-aos="fade-up">
+                    <h1 class="hero-title">
+                        Professional Design Services
+                        <span class="gradient-text">That Convert</span>
+                    </h1>
+                    <p class="hero-description">
+                        From stunning logos to complete brand identities, our comprehensive design services help businesses 
+                        stand out, engage customers, and drive growth.
+                    </p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">8</span>
+                            <span class="stat-label">Service Categories</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">48h</span>
+                            <span class="stat-label">Average Delivery</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Satisfaction Rate</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-visual" data-aos="fade-left">
+                    <div class="services-showcase">
+                        <div class="service-icon-grid">
+                            <div class="icon-item"><i class="fas fa-palette"></i></div>
+                            <div class="icon-item"><i class="fas fa-id-card"></i></div>
+                            <div class="icon-item"><i class="fas fa-envelope-open-text"></i></div>
+                            <div class="icon-item"><i class="fas fa-share-alt"></i></div>
+                            <div class="icon-item"><i class="fas fa-box"></i></div>
+                            <div class="icon-item"><i class="fas fa-print"></i></div>
+                            <div class="icon-item"><i class="fas fa-chart-bar"></i></div>
+                            <div class="icon-item"><i class="fas fa-tags"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Grid -->
+<section class="services-grid">
+    <div class="container">
+        {% for service in services %}
+        <div class="service-section" id="{{ service.name.lower().replace(' ', '-').replace('&', '').replace(',', '') }}" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+            <div class="row align-items-center {{ 'flex-row-reverse' if loop.index % 2 == 0 else '' }}">
+                <div class="col-lg-6">
+                    <div class="service-image">
+                        <div class="image-container">
+                            <img src="{{ url_for('static', filename='images/services/service-' + loop.index|string + '.jpg') }}" 
+                                 alt="{{ service.name }}" 
+                                 onerror="this.src='{{ url_for('static', filename='images/placeholder-service.jpg') }}'">
+                            <div class="image-overlay">
+                                <div class="overlay-content">
+                                    <i class="{{ service.icon_class }}"></i>
+                                    <span>{{ service.name }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="service-content">
+                        <div class="service-badge">
+                            <i class="{{ service.icon_class }} me-2"></i>
+                            <span>Professional Service</span>
+                        </div>
+                        <h2 class="service-title">{{ service.name }}</h2>
+                        <p class="service-description">{{ service.description }}</p>
+                        
+                        <!-- What's Included -->
+                        <div class="service-includes">
+                            <h4>What's Included:</h4>
+                            <ul class="includes-list">
+                                {% if 'Logo' in service.name %}
+                                <li><i class="fas fa-check"></i> Custom logo concepts</li>
+                                <li><i class="fas fa-check"></i> Brand color palette</li>
+                                <li><i class="fas fa-check"></i> Typography guidelines</li>
+                                <li><i class="fas fa-check"></i> Multiple file formats</li>
+                                <li><i class="fas fa-check"></i> Brand style guide</li>
+                                {% elif 'Business Card' in service.name %}
+                                <li><i class="fas fa-check"></i> Professional layout design</li>
+                                <li><i class="fas fa-check"></i> Premium typography</li>
+                                <li><i class="fas fa-check"></i> Print-ready files</li>
+                                <li><i class="fas fa-check"></i> Multiple design options</li>
+                                <li><i class="fas fa-check"></i> QR code integration</li>
+                                {% elif 'Social Media' in service.name %}
+                                <li><i class="fas fa-check"></i> Platform-specific designs</li>
+                                <li><i class="fas fa-check"></i> Content templates</li>
+                                <li><i class="fas fa-check"></i> Brand consistency</li>
+                                <li><i class="fas fa-check"></i> Engagement optimization</li>
+                                <li><i class="fas fa-check"></i> Multiple formats</li>
+                                {% elif 'Packaging' in service.name %}
+                                <li><i class="fas fa-check"></i> 3D mockup visualization</li>
+                                <li><i class="fas fa-check"></i> Die-cut specifications</li>
+                                <li><i class="fas fa-check"></i> Print production files</li>
+                                <li><i class="fas fa-check"></i> Material recommendations</li>
+                                <li><i class="fas fa-check"></i> Shelf impact analysis</li>
+                                {% elif 'PowerPoint' in service.name %}
+                                <li><i class="fas fa-check"></i> Professional slide layouts</li>
+                                <li><i class="fas fa-check"></i> Infographic elements</li>
+                                <li><i class="fas fa-check"></i> Animation effects</li>
+                                <li><i class="fas fa-check"></i> Master slide templates</li>
+                                <li><i class="fas fa-check"></i> Brand consistency</li>
+                                {% else %}
+                                <li><i class="fas fa-check"></i> Custom design concepts</li>
+                                <li><i class="fas fa-check"></i> Professional execution</li>
+                                <li><i class="fas fa-check"></i> Multiple revisions</li>
+                                <li><i class="fas fa-check"></i> High-quality deliverables</li>
+                                <li><i class="fas fa-check"></i> Brand guidelines</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        
+                        <!-- Pricing and Timeline -->
+                        <div class="service-details">
+                            <div class="detail-item">
+                                <h5>Starting Price</h5>
+                                <span class="price">{{ service.price_range or 'Contact for quote' }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <h5>Timeline</h5>
+                                <span class="timeline">
+                                    {% if 'Logo' in service.name %}3-5 business days
+                                    {% elif 'Business Card' in service.name %}1-2 business days
+                                    {% elif 'Social Media' in service.name %}24-48 hours
+                                    {% elif 'Packaging' in service.name %}5-7 business days
+                                    {% elif 'PowerPoint' in service.name %}2-4 business days
+                                    {% else %}2-5 business days
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- CTA Buttons -->
+                        <div class="service-cta">
+                            <a href="{{ url_for('service_detail', service_id=service.id) }}" class="btn btn-primary btn-lg me-3">
+                                <i class="fas fa-arrow-right me-2"></i>Learn More
+                            </a>
+                            <a href="{{ url_for('quote') }}?service={{ service.name }}" class="btn btn-outline-primary btn-lg me-3">
+                                <i class="fas fa-quote-right me-2"></i>Get Quote
+                            </a>
+                            <a href="{{ url_for('portfolio') }}?service={{ service.id }}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-images me-2"></i>Examples
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if not loop.last %}
+        <hr class="service-divider">
+        {% endif %}
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Process Section -->
+<section class="process-section">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+            <h2 class="section-title">Our <span class="gradient-text">Design Process</span></h2>
+            <p class="section-description">
+                A proven methodology that ensures every project delivers exceptional results and exceeds expectations.
+            </p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="process-step">
+                    <div class="step-icon">
+                        <span class="step-number">1</span>
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h4 class="step-title">Discovery Call</h4>
+                    <p class="step-description">
+                        We start by understanding your business, goals, target audience, and design preferences.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="process-step">
+                    <div class="step-icon">
+                        <span class="step-number">2</span>
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h4 class="step-title">Concept Development</h4>
+                    <p class="step-description">
+                        Our creative team develops initial concepts and design directions based on your requirements.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="process-step">
+                    <div class="step-icon">
+                        <span class="step-number">3</span>
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <h4 class="step-title">Design & Refinement</h4>
+                    <p class="step-description">
+                        We create detailed designs, gather your feedback, and refine until everything is perfect.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="process-step">
+                    <div class="step-icon">
+                        <span class="step-number">4</span>
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h4 class="step-title">Final Delivery</h4>
+                    <p class="step-description">
+                        You receive all final files in multiple formats, ready for immediate use across all platforms.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="faq-section">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+            <h2 class="section-title">Frequently Asked <span class="gradient-text">Questions</span></h2>
+            <p class="section-description">
+                Get answers to common questions about our design services and process.
+            </p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="100">
+                        <h2 class="accordion-header" id="faq1">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                What's included in your logo design package?
+                            </button>
+                        </h2>
+                        <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Our logo design package includes 3-5 initial concepts, unlimited revisions, final logo in multiple formats (AI, EPS, PDF, PNG, JPG), color and black & white versions, and basic brand guidelines.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="200">
+                        <h2 class="accordion-header" id="faq2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                How long does it take to complete a project?
+                            </button>
+                        </h2>
+                        <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Project timelines vary by service type. Simple designs like business cards take 1-2 days, while complex projects like full brand identity can take 1-2 weeks. We always provide clear timelines upfront.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="300">
+                        <h2 class="accordion-header" id="faq3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                Do you provide revisions?
+                            </button>
+                        </h2>
+                        <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes! We include unlimited revisions in all our packages. We want to ensure you're 100% satisfied with the final design before project completion.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="400">
+                        <h2 class="accordion-header" id="faq4">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+                                What file formats do you provide?
+                            </button>
+                        </h2>
+                        <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                We provide files in all standard formats: vector files (AI, EPS, PDF) for print, high-resolution PNG and JPG for web use, and SVG for web development. All optimized for their intended use.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="500">
+                        <h2 class="accordion-header" id="faq5">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5">
+                                Do you work with international clients?
+                            </button>
+                        </h2>
+                        <div id="collapse5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Absolutely! We work with clients worldwide. All communication is handled via email, WhatsApp, and video calls. We're flexible with time zones and payment methods.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="services-cta">
+    <div class="container">
+        <div class="cta-content text-center" data-aos="fade-up">
+            <h2 class="cta-title">Ready to Start Your Design Project?</h2>
+            <p class="cta-description">
+                Let's discuss your design needs and create something amazing together. Get a free quote in 24 hours.
+            </p>
+            
+            <div class="cta-buttons">
+                <a href="{{ url_for('quote') }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-quote-right me-2"></i>Get Free Quote
+                </a>
+                <a href="{{ url_for('contact') }}" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-phone me-2"></i>Schedule Call
+                </a>
+            </div>
+            
+            <div class="cta-guarantee">
+                <div class="guarantee-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>100% Satisfaction Guaranteed</span>
+                </div>
+                <div class="guarantee-item">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Unlimited Revisions</span>
+                </div>
+                <div class="guarantee-item">
+                    <i class="fas fa-clock"></i>
+                    <span>On-Time Delivery</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// Highlight active service section
+window.addEventListener('scroll', function() {
+    const sections = document.querySelectorAll('.service-section');
+    const navLinks = document.querySelectorAll('.navbar-nav .dropdown-menu a');
+    
+    let current = '';
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        if (scrollY >= (sectionTop - 200)) {
+            current = section.getAttribute('id');
+        }
+    });
+    
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href').includes(current)) {
+            link.classList.add('active');
+        }
+    });
+});
+</script>
+{% endblock %}

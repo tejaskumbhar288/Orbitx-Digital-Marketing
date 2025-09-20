@@ -1,0 +1,427 @@
+{% extends "base.html" %}
+
+{% block title %}Case Studies - Success Stories | Pixel Media Design{% endblock %}
+
+{% block meta_description %}Discover how our design solutions have helped businesses achieve measurable results. Real case studies with before/after comparisons and success metrics.{% endblock %}
+
+{% block content %}
+<!-- Case Studies Hero -->
+<section class="case-studies-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content" data-aos="fade-up">
+                    <h1 class="hero-title">
+                        Real Results from
+                        <span class="gradient-text">Real Businesses</span>
+                    </h1>
+                    <p class="hero-description">
+                        Discover how our strategic design solutions have helped businesses across industries 
+                        achieve measurable growth, increased brand recognition, and improved customer engagement.
+                    </p>
+                    
+                    <div class="success-metrics">
+                        <div class="metric-item">
+                            <span class="metric-number">300%</span>
+                            <span class="metric-label">Average ROI Increase</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-number">95%</span>
+                            <span class="metric-label">Client Satisfaction Rate</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-number">15+</span>
+                            <span class="metric-label">Industries Served</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-visual" data-aos="fade-left">
+                    <div class="results-showcase">
+                        <div class="before-after-preview">
+                            <div class="preview-card">
+                                <span class="preview-label">Before</span>
+                                <div class="preview-content old"></div>
+                            </div>
+                            <div class="arrow-transform">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                            <div class="preview-card">
+                                <span class="preview-label">After</span>
+                                <div class="preview-content new"></div>
+                            </div>
+                        </div>
+                        <div class="growth-indicator">
+                            <i class="fas fa-chart-line"></i>
+                            <span>+250% Growth</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Case Studies -->
+<section class="featured-case-studies">
+    <div class="container">
+        {% for case_study in case_studies %}
+        <div class="case-study-card" data-aos="fade-up" data-aos-delay="{{ loop.index * 200 }}">
+            <div class="row align-items-center {{ 'flex-row-reverse' if loop.index % 2 == 0 else '' }}">
+                <div class="col-lg-6">
+                    <div class="case-study-visual">
+                        {% if case_study.before_image_url and case_study.after_image_url %}
+                        <div class="before-after-slider">
+                            <div class="before-image">
+                                <img src="{{ case_study.before_image_url }}" alt="Before - {{ case_study.title }}">
+                                <div class="image-label">Before</div>
+                            </div>
+                            <div class="after-image">
+                                <img src="{{ case_study.after_image_url }}" alt="After - {{ case_study.title }}">
+                                <div class="image-label">After</div>
+                            </div>
+                            <div class="slider-handle">
+                                <i class="fas fa-arrows-alt-h"></i>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="case-study-image">
+                            <img src="{{ case_study.image_url or url_for('static', filename='images/placeholder-case-study.jpg') }}" 
+                                 alt="{{ case_study.title }}">
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="case-study-content">
+                        <div class="client-info">
+                            <div class="client-logo">
+                                <span>{{ case_study.client_name[:2].upper() }}</span>
+                            </div>
+                            <div class="client-details">
+                                <h3 class="client-name">{{ case_study.client_name }}</h3>
+                                <span class="industry">{{ case_study.service.name }}</span>
+                            </div>
+                        </div>
+                        
+                        <h2 class="case-study-title">{{ case_study.title }}</h2>
+                        
+                        {% if case_study.challenge %}
+                        <div class="case-section">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Challenge</h4>
+                            <p>{{ case_study.challenge }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if case_study.solution %}
+                        <div class="case-section">
+                            <h4><i class="fas fa-lightbulb"></i> Solution</h4>
+                            <p>{{ case_study.solution }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if case_study.results %}
+                        <div class="case-section results">
+                            <h4><i class="fas fa-chart-bar"></i> Results</h4>
+                            <p>{{ case_study.results }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if case_study.client_testimonial %}
+                        <div class="testimonial">
+                            <blockquote>
+                                <i class="fas fa-quote-left"></i>
+                                {{ case_study.client_testimonial }}
+                            </blockquote>
+                            <cite>— {{ case_study.client_name }}</cite>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="case-cta">
+                            <a href="{{ url_for('quote') }}?service={{ case_study.service.name }}" class="btn btn-primary me-3">
+                                <i class="fas fa-quote-right me-2"></i>Get Similar Results
+                            </a>
+                            <a href="{{ url_for('portfolio') }}?service={{ case_study.service_id }}" class="btn btn-outline-primary">
+                                <i class="fas fa-images me-2"></i>View More Work
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if not loop.last %}
+        <hr class="case-study-divider">
+        {% endif %}
+        {% endfor %}
+        
+        {% if not case_studies %}
+        <div class="text-center py-5">
+            <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+            <h3>Case Studies Coming Soon</h3>
+            <p class="text-muted">We're preparing detailed case studies to showcase our success stories. Check back soon!</p>
+            <a href="{{ url_for('portfolio') }}" class="btn btn-primary">
+                <i class="fas fa-images me-2"></i>View Our Portfolio
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Success Metrics Overview -->
+<section class="success-metrics-section">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+            <h2 class="section-title">Proven <span class="gradient-text">Success Metrics</span></h2>
+            <p class="section-description">
+                Our design solutions consistently deliver measurable results across key business metrics.
+            </p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="metric-value">+250%</div>
+                    <div class="metric-label">Average Brand Recognition Increase</div>
+                    <div class="metric-description">
+                        Clients see significant improvement in brand awareness after our design interventions.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="metric-value">+180%</div>
+                    <div class="metric-label">Customer Engagement Boost</div>
+                    <div class="metric-description">
+                        Professional designs drive higher engagement across all customer touchpoints.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="metric-value">3x</div>
+                    <div class="metric-label">Return on Investment</div>
+                    <div class="metric-description">
+                        Every rupee invested in professional design returns three times the value.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="metric-value">48h</div>
+                    <div class="metric-label">Average Delivery Time</div>
+                    <div class="metric-description">
+                        Fast turnaround without compromising on quality or attention to detail.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Industries We Serve -->
+<section class="industries-section">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+            <h2 class="section-title">Industries We've <span class="gradient-text">Transformed</span></h2>
+            <p class="section-description">
+                Our design expertise spans across diverse industries, each with unique challenges and opportunities.
+            </p>
+        </div>
+        
+        <div class="industries-grid">
+            <div class="industry-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="industry-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <h4>Restaurant & Food</h4>
+                <p>Menu designs, packaging, and branding that make mouths water and drive sales.</p>
+                <div class="industry-stat">+300% foot traffic increase</div>
+            </div>
+            
+            <div class="industry-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="industry-icon">
+                    <i class="fas fa-laptop-code"></i>
+                </div>
+                <h4>Technology</h4>
+                <p>Modern, clean designs that communicate innovation and build trust with users.</p>
+                <div class="industry-stat">+200% user engagement</div>
+            </div>
+            
+            <div class="industry-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="industry-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <h4>E-commerce</h4>
+                <p>Product packaging and brand identity that stands out and drives conversions.</p>
+                <div class="industry-stat">+150% conversion rate</div>
+            </div>
+            
+            <div class="industry-card" data-aos="fade-up" data-aos-delay="400">
+                <div class="industry-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <h4>Healthcare</h4>
+                <p>Professional, trustworthy designs that communicate care and expertise.</p>
+                <div class="industry-stat">+120% patient trust</div>
+            </div>
+            
+            <div class="industry-card" data-aos="fade-up" data-aos-delay="500">
+                <div class="industry-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h4>Education</h4>
+                <p>Engaging educational materials and branding that inspire learning.</p>
+                <div class="industry-stat">+180% student engagement</div>
+            </div>
+            
+            <div class="industry-card" data-aos="fade-up" data-aos-delay="600">
+                <div class="industry-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <h4>Real Estate</h4>
+                <p>Sophisticated marketing materials that sell properties faster.</p>
+                <div class="industry-stat">+90% faster sales</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="case-studies-cta">
+    <div class="container">
+        <div class="cta-content text-center" data-aos="fade-up">
+            <h2 class="cta-title">
+                Ready to Become Our Next
+                <span class="gradient-text">Success Story?</span>
+            </h2>
+            <p class="cta-description">
+                Join the growing list of businesses that have transformed their brand and achieved remarkable results 
+                with our strategic design solutions.
+            </p>
+            
+            <div class="cta-buttons">
+                <a href="{{ url_for('quote') }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-rocket me-2"></i>Start Your Transformation
+                </a>
+                <a href="{{ url_for('contact') }}" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-phone me-2"></i>Schedule Strategy Call
+                </a>
+            </div>
+            
+            <div class="success-guarantee">
+                <div class="guarantee-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Success Guarantee: We don't stop until you see results</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Before/After Image Slider
+document.addEventListener('DOMContentLoaded', function() {
+    const sliders = document.querySelectorAll('.before-after-slider');
+    
+    sliders.forEach(slider => {
+        const handle = slider.querySelector('.slider-handle');
+        const afterImage = slider.querySelector('.after-image');
+        let isDragging = false;
+        
+        function updateSlider(x) {
+            const rect = slider.getBoundingClientRect();
+            const position = Math.max(0, Math.min(1, (x - rect.left) / rect.width));
+            afterImage.style.clipPath = `inset(0 ${(1 - position) * 100}% 0 0)`;
+            handle.style.left = `${position * 100}%`;
+        }
+        
+        handle.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            e.preventDefault();
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                updateSlider(e.clientX);
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        
+        // Touch events for mobile
+        handle.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            e.preventDefault();
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            if (isDragging && e.touches[0]) {
+                updateSlider(e.touches[0].clientX);
+            }
+        });
+        
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+        
+        // Initialize at 50%
+        updateSlider(slider.getBoundingClientRect().left + slider.getBoundingClientRect().width / 2);
+    });
+});
+
+// Animate counters when in view
+const observerOptions = {
+    threshold: 0.5,
+    rootMargin: '0px 0px -100px 0px'
+};
+
+const countObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const counter = entry.target;
+            const target = parseInt(counter.textContent.replace(/[^\d]/g, ''));
+            const increment = target / 50;
+            let current = 0;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    counter.textContent = counter.textContent.replace(/[\d,]+/, target.toLocaleString());
+                    clearInterval(timer);
+                } else {
+                    counter.textContent = counter.textContent.replace(/[\d,]+/, Math.floor(current).toLocaleString());
+                }
+            }, 40);
+            
+            countObserver.unobserve(counter);
+        }
+    });
+}, observerOptions);
+
+document.querySelectorAll('.metric-value, .metric-number, .stat-number').forEach(counter => {
+    countObserver.observe(counter);
+});
+</script>
+{% endblock %}
