@@ -1,0 +1,100 @@
+# Environment variables - NEVER commit these!
+.env
+.env.local
+.env.production
+.env.staging
+
+# Claude Code files
+.claude/
+.claude/**
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Uploads
+static/uploads/
+uploads/
+
+# Backup files
+*.bak
+*.backup
+
+# Security sensitive files
+config.ini
+secrets.json
+*.key
+*.pem
+*.crt
+
+# Testing
+.coverage
+.pytest_cache/
+.tox/
+htmlcov/
+
+# Flask instance folder
+instance/
+
+# Node modules (if you add any JS build tools later)
+node_modules/
+
+# Compiled CSS/JS (if you add build tools later)
+static/dist/
+static/build/
