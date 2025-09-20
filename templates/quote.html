@@ -87,7 +87,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         {{ form.client_name.label(class="form-label") }}
-                                        {{ form.client_name(class="form-control" + (" is-invalid" if form.client_name.errors else "")) }}
+                                        {{ form.client_name(class="form-control" + (" is-invalid" if form.client_name.errors else ""), maxlength="100") }}
                                         {% if form.client_name.errors %}
                                             <div class="invalid-feedback">
                                                 {% for error in form.client_name.errors %}{{ error }}{% endfor %}
@@ -98,7 +98,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         {{ form.email.label(class="form-label") }}
-                                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), maxlength="254") }}
                                         {% if form.email.errors %}
                                             <div class="invalid-feedback">
                                                 {% for error in form.email.errors %}{{ error }}{% endfor %}
@@ -112,14 +112,14 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         {{ form.phone.label(class="form-label") }}
-                                        {{ form.phone(class="form-control") }}
+                                        {{ form.phone(class="form-control", maxlength="20") }}
                                         <small class="form-text text-muted">For quick communication about your project</small>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         {{ form.company_name.label(class="form-label") }}
-                                        {{ form.company_name(class="form-control") }}
+                                        {{ form.company_name(class="form-control", maxlength="100") }}
                                         <small class="form-text text-muted">Optional - your business name</small>
                                     </div>
                                 </div>
@@ -169,7 +169,7 @@
                             
                             <div class="form-group">
                                 {{ form.project_description.label(class="form-label") }}
-                                {{ form.project_description(class="form-control" + (" is-invalid" if form.project_description.errors else "")) }}
+                                {{ form.project_description(class="form-control" + (" is-invalid" if form.project_description.errors else ""), maxlength="2000") }}
                                 {% if form.project_description.errors %}
                                     <div class="invalid-feedback">
                                         {% for error in form.project_description.errors %}{{ error }}{% endfor %}
@@ -205,7 +205,7 @@
                             
                             <div class="form-group">
                                 {{ form.additional_requirements.label(class="form-label") }}
-                                {{ form.additional_requirements(class="form-control") }}
+                                {{ form.additional_requirements(class="form-control", maxlength="1000") }}
                                 <small class="form-text text-muted">Any additional information, special requests, or files you'd like to share</small>
                             </div>
                             
@@ -238,8 +238,10 @@
                             
                             <div class="form-group">
                                 <div class="form-check">
-                                    {{ form.subscribe_newsletter(class="form-check-input") }}
-                                    {{ form.subscribe_newsletter.label(class="form-check-label") }}
+                                    <input class="form-check-input" type="checkbox" id="subscribe_newsletter" name="subscribe_newsletter" value="y">
+                                    <label class="form-check-label" for="subscribe_newsletter">
+                                        Subscribe to our newsletter for design tips and updates
+                                    </label>
                                 </div>
                             </div>
 

@@ -25,11 +25,11 @@ class ContactForm(FlaskForm):
     submit = SubmitField('Send Message')
 
 class QuoteForm(FlaskForm):
-    client_name = StringField('Client Name', validators=[DataRequired(), Length(min=2, max=100)])
-    name = StringField('Name', validators=[DataRequired(), Length(min=2, max=100)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    phone = StringField('Phone', validators=[Optional(), Length(max=20)])
-    company_name = StringField('Company Name', validators=[Optional(), Length(max=100)])
+    client_name = StringField('Client Name', validators=[DataRequired(), Length(min=2, max=100)], render_kw={'maxlength': 100})
+    name = StringField('Name', validators=[DataRequired(), Length(min=2, max=100)], render_kw={'maxlength': 100})
+    email = StringField('Email', validators=[DataRequired(), Email(), Length(max=254)], render_kw={'maxlength': 254})
+    phone = StringField('Phone', validators=[Optional(), Length(max=20)], render_kw={'maxlength': 20})
+    company_name = StringField('Company Name', validators=[Optional(), Length(max=100)], render_kw={'maxlength': 100})
     services_requested = SelectField('Services Requested', choices=[
         ('', 'Select a service...'),
         ('logo-design', 'Logo Design & Branding'),
@@ -58,8 +58,8 @@ class QuoteForm(FlaskForm):
         ('month', 'Within a month'),
         ('flexible', 'Flexible')
     ], validators=[Optional()])
-    project_description = TextAreaField('Project Description', validators=[DataRequired(), Length(min=10, max=2000)])
-    additional_requirements = TextAreaField('Additional Requirements', validators=[Optional(), Length(max=1000)])
+    project_description = TextAreaField('Project Description', validators=[DataRequired(), Length(min=10, max=2000)], render_kw={'maxlength': 2000})
+    additional_requirements = TextAreaField('Additional Requirements', validators=[Optional(), Length(max=1000)], render_kw={'maxlength': 1000})
     reference_files = FileField('Reference Files (Optional)', validators=[
         FileAllowed(['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx'], 'Images and documents only!')
     ])
