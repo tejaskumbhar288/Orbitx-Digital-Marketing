@@ -1,5 +1,5 @@
 # Digital Marketing Website Development Plan
-## Sarvesh Kumbhar Design Services
+## OrbitX
 
 ### 🎯 Project Overview
 A modern, professional digital marketing website showcasing design services with portfolio, client management, and quote request functionality.

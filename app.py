@@ -259,7 +259,7 @@ def internal_error(error):
 def inject_globals():
     return {
         'current_year': datetime.now().year,
-        'site_name': 'Sarvesh Kumbhar Design Services'
+        'site_name': 'OrbitX'
     }
 
 if __name__ == '__main__':

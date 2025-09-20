@@ -1,4 +1,4 @@
-# Sarvesh Kumbhar Design Services Website
+# OrbitX Website
 
 A modern, professional digital marketing website built with Flask, featuring a complete design portfolio, service offerings, and client management system. Inspired by Digital Silk's design approach with custom branding and functionality.
 
@@ -332,7 +332,7 @@ For technical support or customization requests:
 
 ## 📄 License
 
-This project is created for Sarvesh Kumbhar Design Services. All rights reserved.
+This project is created for OrbitX. All rights reserved.
 
 ## 🎉 Getting Started Checklist
 
@@ -366,6 +366,6 @@ python app.py
 
 ---
 
-**Built with ❤️ for Sarvesh Kumbhar Design Services**
+**Built with ❤️ for OrbitX**
 
 Transform your business with professional design solutions that drive results!

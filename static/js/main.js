@@ -1,5 +1,5 @@
 /**
- * Main JavaScript file for Sarvesh Kumbhar Design Website
+ * Main JavaScript file for OrbitX Website
  * Contains all interactive features and functionality
  */
 
