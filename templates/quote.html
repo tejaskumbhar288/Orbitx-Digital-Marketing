@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-<!-- CACHE BUSTER v2024-09-20-6:20 -->
+<!-- CACHE BUSTER v2024-09-20-6:27 - ALL FORM FIELDS MANUAL -->
 
 {% block title %}Request a Quote - Get Your Design Project Estimate | OrbitX Design{% endblock %}
 
@@ -113,14 +113,14 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         {{ form.phone.label(class="form-label") }}
-                                        {{ form.phone(class="form-control", maxlength="20") }}
+                                        <input type="tel" class="form-control" id="phone" name="phone" maxlength="20">
                                         <small class="form-text text-muted">For quick communication about your project</small>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         {{ form.company_name.label(class="form-label") }}
-                                        {{ form.company_name(class="form-control", maxlength="100") }}
+                                        <input type="text" class="form-control" id="company_name" name="company_name" maxlength="100">
                                         <small class="form-text text-muted">Optional - your business name</small>
                                     </div>
                                 </div>
@@ -142,7 +142,19 @@
                             
                             <div class="form-group">
                                 {{ form.services_requested.label(class="form-label") }}
-                                {{ form.services_requested(class="form-control" + (" is-invalid" if form.services_requested.errors else "")) }}
+                                <select class="form-control" id="services_requested" name="services_requested" required>
+                                    <option value="">Select a service...</option>
+                                    <option value="logo-design">Logo Design & Branding</option>
+                                    <option value="business-card">Business Card Design</option>
+                                    <option value="flyer-design">Flyer Design</option>
+                                    <option value="social-media">Social Media Creatives</option>
+                                    <option value="packaging">Packaging Design</option>
+                                    <option value="invitation-cards">Invitation Card Design</option>
+                                    <option value="powerpoint">PowerPoint Presentations</option>
+                                    <option value="campaign-design">Campaign Design</option>
+                                    <option value="label-design">Label Design</option>
+                                    <option value="other">Other</option>
+                                </select>
                                 <small class="form-text text-muted">Choose the primary service you need for this project</small>
                                 {% if form.services_requested.errors %}
                                     <div class="invalid-feedback d-block">
@@ -170,7 +182,7 @@
                             
                             <div class="form-group">
                                 {{ form.project_description.label(class="form-label") }}
-                                {{ form.project_description(class="form-control" + (" is-invalid" if form.project_description.errors else ""), maxlength="2000") }}
+                                <textarea class="form-control" id="project_description" name="project_description" maxlength="2000" rows="5" required></textarea>
                                 {% if form.project_description.errors %}
                                     <div class="invalid-feedback">
                                         {% for error in form.project_description.errors %}{{ error }}{% endfor %}
@@ -183,7 +195,15 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         {{ form.budget_range.label(class="form-label") }}
-                                        {{ form.budget_range(class="form-control" + (" is-invalid" if form.budget_range.errors else "")) }}
+                                        <select class="form-control" id="budget_range" name="budget_range">
+                                            <option value="">Select budget range...</option>
+                                            <option value="500-1000">₹500 - ₹1,000</option>
+                                            <option value="1000-2500">₹1,000 - ₹2,500</option>
+                                            <option value="2500-5000">₹2,500 - ₹5,000</option>
+                                            <option value="5000-10000">₹5,000 - ₹10,000</option>
+                                            <option value="10000+">₹10,000+</option>
+                                            <option value="discuss">Let's Discuss</option>
+                                        </select>
                                         {% if form.budget_range.errors %}
                                             <div class="invalid-feedback">
                                                 {% for error in form.budget_range.errors %}{{ error }}{% endfor %}
@@ -194,7 +214,14 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         {{ form.timeline.label(class="form-label") }}
-                                        {{ form.timeline(class="form-control" + (" is-invalid" if form.timeline.errors else "")) }}
+                                        <select class="form-control" id="timeline" name="timeline">
+                                            <option value="">Select timeline...</option>
+                                            <option value="urgent">Urgent (1-2 days)</option>
+                                            <option value="week">Within a week</option>
+                                            <option value="two-weeks">2-3 weeks</option>
+                                            <option value="month">Within a month</option>
+                                            <option value="flexible">Flexible</option>
+                                        </select>
                                         {% if form.timeline.errors %}
                                             <div class="invalid-feedback">
                                                 {% for error in form.timeline.errors %}{{ error }}{% endfor %}
@@ -212,7 +239,7 @@
                             
                             <div class="form-group">
                                 {{ form.reference_files.label(class="form-label") }}
-                                {{ form.reference_files(class="form-control") }}
+                                <input type="file" class="form-control" id="reference_files" name="reference_files" multiple accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx">
                                 <small class="form-text text-muted">Upload inspiration images, current designs, or reference materials (Max 16MB)</small>
                             </div>
                             
@@ -260,7 +287,9 @@
                                 <button type="button" class="btn btn-outline-secondary prev-step">
                                     <i class="fas fa-arrow-left me-2"></i> Back
                                 </button>
-                                {{ form.submit(class="btn btn-success btn-lg") }}
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-rocket me-2"></i>Get Quote
+                                </button>
                             </div>
                         </div>
                     </form>
