@@ -1643,7 +1643,7 @@ section {
 .whatsapp-float {
     position: fixed;
     bottom: 2rem;
-    right: 2rem;
+    left: 2rem;
     width: 60px;
     height: 60px;
     background: #25D366;
@@ -1787,11 +1787,11 @@ section {
     
     .whatsapp-float {
         bottom: 1rem;
-        right: 1rem;
+        left: 1rem;
     }
     
     .back-to-top {
-        bottom: 1rem;
+        bottom: 6rem;
         left: 1rem;
     }
 }

@@ -119,3 +119,38 @@ class Portfolio(db.Model):
 
     def __repr__(self):
         return f'<Portfolio {self.title}>'
+
+class ChatConversation(db.Model):
+    __tablename__ = 'chat_conversations'
+
+    id = db.Column(db.String(36), primary_key=True)
+    user_session_id = db.Column(db.String(100))
+    user_name = db.Column(db.String(100))
+    user_email = db.Column(db.String(120))
+    user_phone = db.Column(db.String(20))
+    status = db.Column(db.String(20), default='active')
+    context_data = db.Column(db.Text)
+    quote_request_id = db.Column(db.Integer, db.ForeignKey('quote_requests.id'))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    messages = db.relationship('ChatMessage', backref='conversation', lazy=True, cascade='all, delete-orphan')
+    quote_request = db.relationship('QuoteRequest', backref='chat_conversation')
+
+    def __repr__(self):
+        return f'<ChatConversation {self.id}>'
+
+class ChatMessage(db.Model):
+    __tablename__ = 'chat_messages'
+
+    id = db.Column(db.Integer, primary_key=True)
+    conversation_id = db.Column(db.String(36), db.ForeignKey('chat_conversations.id'), nullable=False)
+    sender = db.Column(db.String(10), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    message_type = db.Column(db.String(20), default='text')
+    message_metadata = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<ChatMessage {self.id}: {self.sender}>'
