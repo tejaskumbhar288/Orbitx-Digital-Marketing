@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
-from models import db, Service, ContactInquiry, QuoteRequest, Testimonial, BlogPost, Portfolio
+from models import db, Service, ContactInquiry, QuoteRequest, Testimonial, BlogPost, Portfolio, ChatConversation, ChatMessage
 from forms import ContactForm, QuoteForm
 import os
 from datetime import datetime
@@ -12,6 +12,7 @@ import webbrowser
 import asyncio
 import openai
 from twilio.rest import Client
+import uuid
 
 # Load environment variables
 load_dotenv()
@@ -527,6 +528,118 @@ def not_found_error(error):
 def internal_error(error):
     db.session.rollback()
     return render_template('errors/500.html'), 500
+
+# Chatbot API endpoints
+@app.route('/api/chatbot/message', methods=['POST'])
+def chatbot_message():
+    """Handle chatbot messages"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+
+        user_message = data.get('message', '').strip()
+        conversation_id = data.get('conversation_id') or str(uuid.uuid4())
+        user_info = data.get('user_info', {})
+
+        if not user_message:
+            return jsonify({'success': False, 'error': 'Message is required'}), 400
+
+        # Import chatbot here to avoid circular imports
+        from chatbot import get_chatbot
+        chatbot = get_chatbot()
+
+        # Process message
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            result = loop.run_until_complete(
+                chatbot.process_message(conversation_id, user_message, user_info)
+            )
+        finally:
+            loop.close()
+
+        return jsonify(result)
+
+    except Exception as e:
+        app.logger.error(f"Chatbot API error: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error',
+            'bot_response': "I apologize, but I'm experiencing technical difficulties. Please try again or contact us directly."
+        }), 500
+
+@app.route('/api/chatbot/history/<conversation_id>')
+def chatbot_history(conversation_id):
+    """Get conversation history"""
+    try:
+        from chatbot import get_chatbot
+        chatbot = get_chatbot()
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            history = loop.run_until_complete(
+                chatbot.get_conversation_history(conversation_id)
+            )
+        finally:
+            loop.close()
+
+        return jsonify({
+            'success': True,
+            'conversation_id': conversation_id,
+            'messages': history
+        })
+
+    except Exception as e:
+        app.logger.error(f"Chatbot history error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/chatbot/services')
+def chatbot_services():
+    """Get available services for chatbot"""
+    try:
+        services = Service.query.filter_by(is_active=True).all()
+        return jsonify({
+            'success': True,
+            'services': [
+                {
+                    'id': service.id,
+                    'name': service.name,
+                    'description': service.short_description or service.description[:100],
+                    'price_range': service.price_range,
+                    'icon': service.icon_class
+                }
+                for service in services
+            ]
+        })
+    except Exception as e:
+        app.logger.error(f"Services API error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/chatbot/portfolio')
+def chatbot_portfolio():
+    """Get portfolio items for chatbot"""
+    try:
+        portfolio_items = Portfolio.query.filter_by(is_featured=True).limit(6).all()
+        return jsonify({
+            'success': True,
+            'portfolio': [
+                {
+                    'id': item.id,
+                    'title': item.title,
+                    'description': item.description[:100] if item.description else '',
+                    'client_name': item.client_name,
+                    'service': item.service.name if item.service else '',
+                    'image_url': item.image_url,
+                    'tags': item.get_tags_list()
+                }
+                for item in portfolio_items
+            ]
+        })
+    except Exception as e:
+        app.logger.error(f"Portfolio API error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # Context processors for global template variables
 @app.context_processor

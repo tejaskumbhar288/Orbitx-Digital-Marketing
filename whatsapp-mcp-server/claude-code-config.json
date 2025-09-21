@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "whatsapp-quote-processor": {
+      "command": "python",
+      "args": [
+        "C:/Users/tejas/OneDrive/Desktop/Digital Mearketing website/whatsapp-mcp-server/server.py"
+      ],
+      "env": {
+        "OPENAI_API_KEY": "your-openai-api-key-here",
+        "TARGET_WHATSAPP_NUMBER": "your-whatsapp-number"
+      }
+    }
+  }
+}
