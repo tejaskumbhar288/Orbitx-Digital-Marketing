@@ -29,13 +29,6 @@ def populate_all_data():
                 'price_range': '₹2,000 - ₹15,000'
             },
             {
-                'name': 'Website Design & Development',
-                'description': 'Modern, responsive website design and development with user-friendly interfaces and mobile optimization.',
-                'short_description': 'Professional websites with modern design',
-                'icon_class': 'fas fa-laptop-code',
-                'price_range': '₹10,000 - ₹50,000'
-            },
-            {
                 'name': 'Social Media Design',
                 'description': 'Creative social media graphics, posts, stories, and complete social media branding for all platforms.',
                 'short_description': 'Engaging social media visuals and content',
@@ -129,7 +122,7 @@ def populate_all_data():
             {
                 'title': 'Festival Social Media Campaign',
                 'description': 'Creative social media posts for various Indian festivals including Diwali, Ganesh Chaturthi, and Independence Day.',
-                'service_id': service_objects[2].id,  # Social Media Design
+                'service_id': service_objects[1].id,  # Social Media Design
                 'image_url': '/static/images/social-media-post/diwali.jpg',
                 'client_name': 'Various Clients',
                 'project_date': date(2024, 10, 15),
@@ -139,7 +132,7 @@ def populate_all_data():
             {
                 'title': 'Friendship Day Social Campaign',
                 'description': 'Engaging social media graphics for Friendship Day celebration with vibrant colors and modern design.',
-                'service_id': service_objects[2].id,  # Social Media Design
+                'service_id': service_objects[1].id,  # Social Media Design
                 'image_url': '/static/images/social-media-post/friendship day.jpg',
                 'client_name': 'Social Media Clients',
                 'project_date': date(2024, 8, 1),
@@ -150,7 +143,7 @@ def populate_all_data():
             {
                 'title': 'Malabar Restaurant Promotion',
                 'description': 'Attractive promotional flyer design for Malabar restaurant featuring authentic Kerala cuisine.',
-                'service_id': service_objects[3].id,  # Flyer Design
+                'service_id': service_objects[2].id,  # Flyer Design
                 'image_url': '/static/images/flyer-design/1-malabar.jpg',
                 'client_name': 'Malabar Restaurant',
                 'project_date': date(2024, 6, 10),
@@ -160,7 +153,7 @@ def populate_all_data():
             {
                 'title': 'Kerala Tour Package',
                 'description': 'Beautiful travel flyer design showcasing Kerala tourism with stunning visuals.',
-                'service_id': service_objects[3].id,  # Flyer Design
+                'service_id': service_objects[2].id,  # Flyer Design
                 'image_url': '/static/images/flyer-design/2-kerala-tour.jpg',
                 'client_name': 'Travel Agency',
                 'project_date': date(2024, 5, 25),
@@ -170,7 +163,7 @@ def populate_all_data():
             {
                 'title': 'CakeVilla Bakery Promotion',
                 'description': 'Delicious cake promotion flyer with mouth-watering visuals and attractive offers.',
-                'service_id': service_objects[3].id,  # Flyer Design
+                'service_id': service_objects[2].id,  # Flyer Design
                 'image_url': '/static/images/flyer-design/3-cakevilla.png',
                 'client_name': 'CakeVilla Bakery',
                 'project_date': date(2024, 4, 12),
@@ -181,7 +174,7 @@ def populate_all_data():
             {
                 'title': 'Suhana Biryani Masala Packaging',
                 'description': 'Premium spice packaging design with authentic Indian aesthetics and clear product information.',
-                'service_id': service_objects[5].id,  # Packaging Design
+                'service_id': service_objects[4].id,  # Packaging Design
                 'image_url': '/static/images/packaging/1-suhana-biryani-masala.png',
                 'client_name': 'Suhana Spices',
                 'project_date': date(2024, 3, 8),
@@ -191,7 +184,7 @@ def populate_all_data():
             {
                 'title': 'Haldiram Namkeen Package',
                 'description': 'Traditional snack packaging design maintaining brand heritage with modern appeal.',
-                'service_id': service_objects[5].id,  # Packaging Design
+                'service_id': service_objects[4].id,  # Packaging Design
                 'image_url': '/static/images/packaging/2-Haldiram-namkeep.png',
                 'client_name': 'Haldiram',
                 'project_date': date(2024, 2, 14),
@@ -202,7 +195,7 @@ def populate_all_data():
             {
                 'title': 'Elegant Wedding Invitation',
                 'description': 'Beautiful wedding invitation card with traditional Indian motifs and modern typography.',
-                'service_id': service_objects[6].id,  # Invitation Cards
+                'service_id': service_objects[5].id,  # Invitation Cards
                 'image_url': '/static/images/invitation-card-design/engagement-card-1.jpg',
                 'client_name': 'Wedding Client',
                 'project_date': date(2024, 1, 20),
@@ -212,7 +205,7 @@ def populate_all_data():
             {
                 'title': 'Corporate Event Invitation',
                 'description': 'Professional corporate event invitation with clean design and company branding.',
-                'service_id': service_objects[6].id,  # Invitation Cards
+                'service_id': service_objects[5].id,  # Invitation Cards
                 'image_url': '/static/images/invitation-card-design/hotel-thalikatta.jpg',
                 'client_name': 'Corporate Client',
                 'project_date': date(2024, 9, 5),
