@@ -5280,16 +5280,24 @@ section {
 @media (max-width: 768px) {
     .hero-section {
         padding: 100px 0 60px !important;
+        /* Mobile-optimized background positioning */
+        background-position: center center !important;
+        background-size: cover !important;
+        min-height: 80vh !important; /* Reduce height for mobile */
+        /* Add better mobile image handling */
+        background-attachment: scroll !important; /* Fixes iOS parallax issues */
     }
 
     .hero-title {
         font-size: 2rem !important;
         line-height: 1.2 !important;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.7) !important; /* Better text readability */
     }
 
     .hero-description {
         font-size: 1rem !important;
         margin-bottom: 30px !important;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.6) !important;
     }
 
     .hero-stats {
@@ -5299,6 +5307,53 @@ section {
 
     .stat-item {
         text-align: center !important;
+    }
+
+    /* Add overlay for better text contrast on mobile */
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3) !important; /* Darker overlay for mobile */
+        z-index: 1;
+    }
+
+    .hero-section .container {
+        position: relative;
+        z-index: 2;
+    }
+}
+
+/* Extra small devices (phones in portrait) */
+@media (max-width: 480px) {
+    .hero-section {
+        min-height: 70vh !important;
+        padding: 80px 0 40px !important;
+    }
+
+    .hero-title {
+        font-size: 1.75rem !important;
+        margin-bottom: 15px !important;
+    }
+
+    .hero-description {
+        font-size: 0.9rem !important;
+        line-height: 1.5 !important;
+    }
+
+    .hero-stats {
+        margin-top: 30px !important;
+    }
+
+    .stat-number {
+        font-size: 1.5rem !important;
+    }
+
+    .stat-label {
+        font-size: 0.8rem !important;
     }
 }
 
