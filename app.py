@@ -656,11 +656,54 @@ def inject_globals():
         'site_name': 'OrbitX'
     }
 
-if __name__ == '__main__':
-    # Create database tables on startup
+# Create database tables on startup - always run this
+try:
     with app.app_context():
         db.create_all()
+        print("✅ Database tables created successfully!")
 
+        # Create initial services if they don't exist
+        if not Service.query.first():
+            print("📊 Creating initial service data...")
+            initial_services = [
+                Service(
+                    name='Logo Design',
+                    description='Professional logo design and branding services for your business',
+                    short_description='Custom logo design with unlimited revisions',
+                    icon_class='fas fa-palette',
+                    price_range='₹2,000 - ₹15,000',
+                    is_active=True
+                ),
+                Service(
+                    name='Website Design',
+                    description='Responsive website design and development services',
+                    short_description='Modern, mobile-friendly websites',
+                    icon_class='fas fa-laptop-code',
+                    price_range='₹10,000 - ₹50,000',
+                    is_active=True
+                ),
+                Service(
+                    name='Social Media Design',
+                    description='Social media graphics and content creation',
+                    short_description='Engaging social media visuals',
+                    icon_class='fas fa-share-alt',
+                    price_range='₹5,000 - ₹20,000',
+                    is_active=True
+                )
+            ]
+
+            for service in initial_services:
+                db.session.add(service)
+
+            db.session.commit()
+            print(f"✅ Created {len(initial_services)} initial services")
+        else:
+            print("📋 Services already exist, skipping initial data creation")
+
+except Exception as e:
+    print(f"❌ Database initialization error: {e}")
+
+if __name__ == '__main__':
     # Run app based on environment
     if os.environ.get('FLASK_ENV') == 'production':
         app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
