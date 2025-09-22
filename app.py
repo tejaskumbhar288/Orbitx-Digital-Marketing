@@ -27,7 +27,15 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-i
 database_url = os.environ.get('DATABASE_URL')
 if database_url and database_url.startswith('postgres://'):
     database_url = database_url.replace('postgres://', 'postgresql://', 1)
-app.config['SQLALCHEMY_DATABASE_URI'] = database_url or f'sqlite:///{os.path.join(basedir, "instance", "database.db")}'
+
+# For Render deployment, use in-memory SQLite if no DATABASE_URL
+if database_url:
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    # Create instance directory if it doesn't exist
+    instance_dir = os.path.join(basedir, "instance")
+    os.makedirs(instance_dir, exist_ok=True)
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(instance_dir, "database.db")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Email configuration
