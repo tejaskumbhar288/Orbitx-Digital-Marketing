@@ -662,43 +662,28 @@ try:
         db.create_all()
         print("Database tables created successfully!")
 
-        # Create initial services if they don't exist
+        # Initialize comprehensive data if database is empty
         if not Service.query.first():
-            print("Creating initial service data...")
-            initial_services = [
-                Service(
-                    name='Logo Design',
-                    description='Professional logo design and branding services for your business',
-                    short_description='Custom logo design with unlimited revisions',
-                    icon_class='fas fa-palette',
-                    price_range='₹2,000 - ₹15,000',
-                    is_active=True
-                ),
-                Service(
-                    name='Website Design',
-                    description='Responsive website design and development services',
-                    short_description='Modern, mobile-friendly websites',
-                    icon_class='fas fa-laptop-code',
-                    price_range='₹10,000 - ₹50,000',
-                    is_active=True
-                ),
-                Service(
-                    name='Social Media Design',
-                    description='Social media graphics and content creation',
-                    short_description='Engaging social media visuals',
-                    icon_class='fas fa-share-alt',
-                    price_range='₹5,000 - ₹20,000',
-                    is_active=True
-                )
-            ]
-
-            for service in initial_services:
-                db.session.add(service)
-
-            db.session.commit()
-            print(f"Created {len(initial_services)} initial services")
+            print("Initializing comprehensive website data...")
+            # Import and run the comprehensive data population
+            try:
+                from populate_data import populate_all_data
+                populate_all_data()
+                print("Comprehensive data initialization completed!")
+            except Exception as populate_error:
+                print(f"Error with comprehensive data population: {populate_error}")
+                # Fallback to basic services if comprehensive population fails
+                print("Falling back to basic service creation...")
+                basic_services = [
+                    Service(name='Logo Design', description='Professional logo design', icon_class='fas fa-palette', price_range='₹2,000 - ₹15,000', is_active=True),
+                    Service(name='Website Design', description='Modern website development', icon_class='fas fa-laptop-code', price_range='₹10,000 - ₹50,000', is_active=True),
+                    Service(name='Social Media Design', description='Social media graphics', icon_class='fas fa-share-alt', price_range='₹5,000 - ₹20,000', is_active=True)
+                ]
+                for service in basic_services:
+                    db.session.add(service)
+                db.session.commit()
         else:
-            print("Services already exist, skipping initial data creation")
+            print("Database already has data, skipping initialization")
 
 except Exception as e:
     print(f"Database initialization error: {e}")
