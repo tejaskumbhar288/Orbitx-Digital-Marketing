@@ -331,10 +331,10 @@ p {
     min-height: 100vh;
 }
 
-/* Mobile-optimized hero image (9:16 aspect ratio) */
+/* Mobile-optimized hero image */
 @media (max-width: 768px) {
     .hero-section {
-        background-image: url('/static/images/hero2.png') !important;
+        background-image: url('/static/images/hero3.jpg') !important;
         background-position: center center !important;
         background-size: cover !important;
         background-attachment: scroll !important; /* Better mobile performance */
