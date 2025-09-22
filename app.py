@@ -57,14 +57,29 @@ mail = Mail(app)
 # Initialize OpenAI client
 openai_client = None
 try:
-    if os.getenv('OPENAI_API_KEY'):
-        openai_client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+    api_key = os.getenv('OPENAI_API_KEY')
+    if api_key and api_key.strip() and not api_key.startswith('REPLACE_WITH'):
+        # Initialize with minimal configuration to avoid proxy/environment conflicts
+        openai_client = openai.OpenAI(
+            api_key=api_key.strip(),
+            timeout=30.0
+        )
         print("OpenAI client initialized successfully")
     else:
-        print("OPENAI_API_KEY not found - chatbot will not work")
+        print("OPENAI_API_KEY not found or is placeholder - chatbot will not work")
+        openai_client = None
 except Exception as e:
     print(f"Failed to initialize OpenAI client: {e}")
-    openai_client = None
+    # Try alternative initialization without extra parameters
+    try:
+        api_key = os.getenv('OPENAI_API_KEY')
+        if api_key and not api_key.startswith('REPLACE_WITH'):
+            import openai as openai_alt
+            openai_client = openai_alt.OpenAI(api_key=api_key.strip())
+            print("OpenAI client initialized successfully (fallback)")
+    except Exception as e2:
+        print(f"Fallback OpenAI initialization also failed: {e2}")
+        openai_client = None
 
 # Initialize Twilio client
 twilio_client = None
