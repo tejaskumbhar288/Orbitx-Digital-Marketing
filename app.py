@@ -58,8 +58,7 @@ mail = Mail(app)
 openai_client = None
 try:
     if os.getenv('OPENAI_API_KEY'):
-        openai.api_key = os.getenv('OPENAI_API_KEY')
-        openai_client = openai
+        openai_client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
         print("OpenAI client initialized successfully")
     else:
         print("OPENAI_API_KEY not found - chatbot will not work")
@@ -73,7 +72,7 @@ if os.getenv('TWILIO_ACCOUNT_SID') and os.getenv('TWILIO_AUTH_TOKEN'):
     twilio_client = Client(os.getenv('TWILIO_ACCOUNT_SID'), os.getenv('TWILIO_AUTH_TOKEN'))
 
 # AI Analysis Functions
-async def analyze_quote_with_ai(quote_data):
+def analyze_quote_with_ai(quote_data):
     """Analyze quote with OpenAI for priority and value estimation"""
     if not openai_client:
         return {"priority": 5, "estimated_value": "Rs 5,000-15,000", "strategy": "Standard response"}
@@ -89,7 +88,7 @@ async def analyze_quote_with_ai(quote_data):
         Priority: X/10
         Value: Rs X,XXX-X,XXX"""
 
-        response = await openai_client.chat.completions.create(
+        response = openai_client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=100
@@ -352,7 +351,7 @@ def quote():
                 def run_ai_analysis():
                     try:
                         # Analyze quote with AI
-                        analysis = asyncio.run(analyze_quote_with_ai(quote_data))
+                        analysis = analyze_quote_with_ai(quote_data)
 
                         # Generate AI-enhanced message
                         ai_message = asyncio.run(generate_ai_enhanced_whatsapp_message(quote_data, analysis))
@@ -439,7 +438,7 @@ def simple_quote_submission():
         def process_quote():
             try:
                 # AI analysis
-                analysis = asyncio.run(analyze_quote_with_ai(quote_data))
+                analysis = analyze_quote_with_ai(quote_data)
 
                 # Send SMS notification
                 sms_sent = send_sms_notification(quote_data, analysis)

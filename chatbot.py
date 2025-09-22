@@ -67,7 +67,7 @@ Current conversation context: {context}
                     role = "assistant" if msg['sender'] == 'bot' else "user"
                     messages.insert(-1, {"role": role, "content": msg['message']})
 
-            response = openai.ChatCompletion.create(
+            response = self.openai_client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=messages,
                 max_tokens=500,
@@ -432,7 +432,7 @@ Current conversation context: {context}
                     asyncio.set_event_loop(loop)
 
                     try:
-                        ai_analysis = loop.run_until_complete(analyze_quote_with_ai(quote_data))
+                        ai_analysis = analyze_quote_with_ai(quote_data)
 
                         # Add chatbot-specific context
                         ai_analysis['source'] = 'AI Chatbot'
@@ -487,7 +487,7 @@ Current conversation context: {context}
             from app import analyze_quote_with_ai, send_sms_notification
 
             # Run AI analysis
-            ai_analysis = asyncio.run(analyze_quote_with_ai(quote_data))
+            ai_analysis = analyze_quote_with_ai(quote_data)
 
             # Add chatbot-specific context
             ai_analysis['source'] = 'AI Chatbot'
