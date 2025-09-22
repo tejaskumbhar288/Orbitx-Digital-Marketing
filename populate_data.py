@@ -141,13 +141,13 @@ def populate_all_data():
             },
             # Flyer Design Portfolio
             {
-                'title': 'Malabar Restaurant Promotion',
-                'description': 'Attractive promotional flyer design for Malabar restaurant featuring authentic Kerala cuisine.',
+                'title': 'Malabar Gold & Diamonds Promotion',
+                'description': 'Elegant promotional flyer design for Malabar Gold & Diamonds featuring premium jewelry collections and festive offers.',
                 'service_id': service_objects[2].id,  # Flyer Design
                 'image_url': '/static/images/flyer-design/1-malabar.jpg',
-                'client_name': 'Malabar Restaurant',
+                'client_name': 'Malabar Gold & Diamonds',
                 'project_date': date(2024, 6, 10),
-                'tags': 'restaurant, food, kerala, promotion',
+                'tags': 'jewelry, gold, diamonds, promotion, luxury',
                 'is_featured': True
             },
             {
