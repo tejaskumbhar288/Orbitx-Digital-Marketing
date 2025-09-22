@@ -43,8 +43,16 @@ mail = Mail(app)
 
 # Initialize OpenAI client
 openai_client = None
-if os.getenv('OPENAI_API_KEY'):
-    openai_client = openai.AsyncOpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+try:
+    if os.getenv('OPENAI_API_KEY'):
+        openai.api_key = os.getenv('OPENAI_API_KEY')
+        openai_client = openai
+        print("OpenAI client initialized successfully")
+    else:
+        print("OPENAI_API_KEY not found - chatbot will not work")
+except Exception as e:
+    print(f"Failed to initialize OpenAI client: {e}")
+    openai_client = None
 
 # Initialize Twilio client
 twilio_client = None
@@ -550,14 +558,7 @@ def chatbot_message():
         chatbot = get_chatbot()
 
         # Process message
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            result = loop.run_until_complete(
-                chatbot.process_message(conversation_id, user_message, user_info)
-            )
-        finally:
-            loop.close()
+        result = chatbot.process_message(conversation_id, user_message, user_info)
 
         return jsonify(result)
 

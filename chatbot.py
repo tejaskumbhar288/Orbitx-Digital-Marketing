@@ -51,7 +51,7 @@ CRITICAL QUOTE CREATION WORKFLOW:
 Current conversation context: {context}
 """
 
-    async def get_ai_response(self, user_message: str, conversation_context: Dict) -> str:
+    def get_ai_response(self, user_message: str, conversation_context: Dict) -> str:
         """Get AI response using OpenAI"""
         try:
             context_str = json.dumps(conversation_context, indent=2)
@@ -67,8 +67,8 @@ Current conversation context: {context}
                     role = "assistant" if msg['sender'] == 'bot' else "user"
                     messages.insert(-1, {"role": role, "content": msg['message']})
 
-            response = await self.openai_client.chat.completions.create(
-                model="gpt-4o-mini",
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
                 messages=messages,
                 max_tokens=500,
                 temperature=0.7
@@ -128,7 +128,7 @@ Current conversation context: {context}
             }
         }
 
-    async def process_message(self, conversation_id: str, user_message: str, user_info: Dict = None) -> Dict:
+    def process_message(self, conversation_id: str, user_message: str, user_info: Dict = None) -> Dict:
         """Process user message and return bot response"""
         try:
             # Get or create conversation
@@ -212,7 +212,7 @@ Current conversation context: {context}
                 context_data['quote_confirmed'] = True
 
             # Generate AI response
-            bot_response = await self.get_ai_response(user_message, context_data)
+            bot_response = self.get_ai_response(user_message, context_data)
 
             # Check if we should create a quote request or guide user for missing info
             should_create_quote = self._has_sufficient_quote_info(context_data, analysis)
