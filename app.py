@@ -577,14 +577,7 @@ def chatbot_history(conversation_id):
         from chatbot import get_chatbot
         chatbot = get_chatbot()
 
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            history = loop.run_until_complete(
-                chatbot.get_conversation_history(conversation_id)
-            )
-        finally:
-            loop.close()
+        history = chatbot.get_conversation_history(conversation_id)
 
         return jsonify({
             'success': True,

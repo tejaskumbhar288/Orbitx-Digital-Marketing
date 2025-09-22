@@ -221,7 +221,7 @@ Current conversation context: {context}
             quote_request_id = None
             if should_create_quote:
                 current_app.logger.info(f"🚀 Creating quote for: {context_data.get('user_name')} - Services: {analysis['services']}")
-                quote_request_id = await self._create_quote_request(conversation, context_data, analysis)
+                quote_request_id = self._create_quote_request(conversation, context_data, analysis)
                 bot_response += "\n\n✅ I've created a quote request for you! Our team will review your requirements and send you a detailed proposal within 2 hours."
 
                 # Send SMS notification immediately (without background thread)
@@ -229,7 +229,7 @@ Current conversation context: {context}
                     quote_request = QuoteRequest.query.get(quote_request_id)
                     if quote_request:
                         current_app.logger.info(f"📞 Attempting to send SMS for quote ID: {quote_request_id}")
-                        sms_success = await self._send_sms_directly(quote_request, analysis)
+                        sms_success = self._send_sms_directly(quote_request, analysis)
                         if sms_success:
                             current_app.logger.info(f"📱 SMS notification sent successfully for: {quote_request.client_name}")
                         else:
@@ -368,7 +368,7 @@ Current conversation context: {context}
 
         return info
 
-    async def _create_quote_request(self, conversation: ChatConversation, context_data: Dict, analysis: Dict) -> int:
+    def _create_quote_request(self, conversation: ChatConversation, context_data: Dict, analysis: Dict) -> int:
         """Create a quote request from conversation data"""
         try:
             # Determine primary service
@@ -467,7 +467,7 @@ Current conversation context: {context}
         except Exception as e:
             current_app.logger.error(f"Failed to setup quote notifications: {e}")
 
-    async def _send_sms_directly(self, quote_request: QuoteRequest, analysis: Dict):
+    def _send_sms_directly(self, quote_request: QuoteRequest, analysis: Dict):
         """Send SMS notification directly without background thread"""
         try:
             # Prepare quote data for existing notification system
@@ -533,7 +533,7 @@ Current conversation context: {context}
 
         return ' '.join(description_parts)
 
-    async def get_conversation_history(self, conversation_id: str) -> List[Dict]:
+    def get_conversation_history(self, conversation_id: str) -> List[Dict]:
         """Get conversation message history"""
         messages = db.session.query(ChatMessage).filter_by(
             conversation_id=conversation_id
