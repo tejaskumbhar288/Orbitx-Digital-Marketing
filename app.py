@@ -56,30 +56,61 @@ mail = Mail(app)
 
 # Initialize OpenAI client
 openai_client = None
-try:
-    api_key = os.getenv('OPENAI_API_KEY')
-    if api_key and api_key.strip() and not api_key.startswith('REPLACE_WITH'):
-        # Initialize with minimal configuration to avoid proxy/environment conflicts
-        openai_client = openai.OpenAI(
-            api_key=api_key.strip(),
-            timeout=30.0
-        )
-        print("OpenAI client initialized successfully")
-    else:
-        print("OPENAI_API_KEY not found or is placeholder - chatbot will not work")
-        openai_client = None
-except Exception as e:
-    print(f"Failed to initialize OpenAI client: {e}")
-    # Try alternative initialization without extra parameters
+
+def init_openai_client():
+    """Initialize OpenAI client with environment cleanup"""
+    global openai_client
+
+    # Clear any proxy-related environment variables that might interfere
+    proxy_vars = ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy', 'ALL_PROXY', 'all_proxy']
+    original_values = {}
+
     try:
+        # Temporarily clear proxy environment variables
+        for var in proxy_vars:
+            if var in os.environ:
+                original_values[var] = os.environ[var]
+                del os.environ[var]
+
         api_key = os.getenv('OPENAI_API_KEY')
-        if api_key and not api_key.startswith('REPLACE_WITH'):
-            import openai as openai_alt
-            openai_client = openai_alt.OpenAI(api_key=api_key.strip())
-            print("OpenAI client initialized successfully (fallback)")
-    except Exception as e2:
-        print(f"Fallback OpenAI initialization also failed: {e2}")
-        openai_client = None
+        if api_key and api_key.strip() and not api_key.startswith('REPLACE_WITH'):
+            # Initialize with absolutely minimal configuration
+            openai_client = openai.OpenAI(api_key=api_key.strip())
+            print("OpenAI client initialized successfully")
+            return True
+        else:
+            print("OPENAI_API_KEY not found or is placeholder - chatbot will not work")
+            return False
+
+    except Exception as e:
+        print(f"Failed to initialize OpenAI client: {e}")
+
+        # Try one more time with explicit proxy disable
+        try:
+            api_key = os.getenv('OPENAI_API_KEY')
+            if api_key and not api_key.startswith('REPLACE_WITH'):
+                # Force disable any proxy usage
+                import httpx
+                client = httpx.Client(proxies={})
+                openai_client = openai.OpenAI(
+                    api_key=api_key.strip(),
+                    http_client=client
+                )
+                print("OpenAI client initialized with proxy disabled")
+                return True
+        except Exception as e2:
+            print(f"All OpenAI initialization attempts failed: {e2}")
+
+    finally:
+        # Restore original proxy environment variables
+        for var, value in original_values.items():
+            os.environ[var] = value
+
+    openai_client = None
+    return False
+
+# Initialize OpenAI
+init_openai_client()
 
 # Initialize Twilio client
 twilio_client = None
