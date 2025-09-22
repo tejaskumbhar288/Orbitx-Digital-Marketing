@@ -660,11 +660,11 @@ def inject_globals():
 try:
     with app.app_context():
         db.create_all()
-        print("✅ Database tables created successfully!")
+        print("Database tables created successfully!")
 
         # Create initial services if they don't exist
         if not Service.query.first():
-            print("📊 Creating initial service data...")
+            print("Creating initial service data...")
             initial_services = [
                 Service(
                     name='Logo Design',
@@ -696,12 +696,12 @@ try:
                 db.session.add(service)
 
             db.session.commit()
-            print(f"✅ Created {len(initial_services)} initial services")
+            print(f"Created {len(initial_services)} initial services")
         else:
-            print("📋 Services already exist, skipping initial data creation")
+            print("Services already exist, skipping initial data creation")
 
 except Exception as e:
-    print(f"❌ Database initialization error: {e}")
+    print(f"Database initialization error: {e}")
 
 if __name__ == '__main__':
     # Run app based on environment
