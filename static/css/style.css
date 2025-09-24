@@ -175,7 +175,7 @@ p {
 }
 
 .navbar-brand img {
-    height: 80px !important;
+    height: 100px !important; /* Increased from 80px to 100px */
     width: auto;
     max-width: none;
 }
@@ -183,13 +183,13 @@ p {
 /* Mobile logo sizing */
 @media (max-width: 768px) {
     .navbar-brand img {
-        height: 70px !important; /* Slightly smaller on mobile for better fit */
+        height: 85px !important; /* Increased from 70px to 85px for mobile */
     }
 }
 
 /* About page logo styling */
 .company-logo img {
-    max-height: 120px !important;
+    max-height: 150px !important; /* Increased from 120px to 150px */
     width: auto;
 }
 
