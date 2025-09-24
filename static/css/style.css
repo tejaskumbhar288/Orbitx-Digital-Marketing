@@ -175,27 +175,25 @@ p {
 }
 
 .navbar-brand img {
-    height: 60px;
+    height: 80px !important;
     width: auto;
-    max-height: 60px;
-    transition: all var(--transition-normal);
+    max-width: none;
 }
 
-.navbar.scrolled .navbar-brand img {
-    height: 50px;
-    max-height: 50px;
-}
-
+/* Mobile logo sizing */
 @media (max-width: 768px) {
     .navbar-brand img {
-        height: 45px;
-        max-height: 45px;
-    }
-    .navbar.scrolled .navbar-brand img {
-        height: 40px;
-        max-height: 40px;
+        height: 70px !important; /* Slightly smaller on mobile for better fit */
     }
 }
+
+/* About page logo styling */
+.company-logo img {
+    max-height: 120px !important;
+    width: auto;
+}
+
+/* Logo sizing handled above with larger, more readable sizes */
 
 .brand-text {
     background: var(--gradient-primary);
