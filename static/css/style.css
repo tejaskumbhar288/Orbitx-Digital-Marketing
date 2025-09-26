@@ -154,14 +154,14 @@ p {
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--gray-200);
     transition: all var(--transition-normal);
-    padding: 1rem 0;
+    padding: 0.5rem 0; /* Reduced from 1rem to 0.5rem for tighter navbar */
     z-index: 1000;
 }
 
 .navbar.scrolled {
     background: rgba(255, 255, 255, 0.98);
     box-shadow: var(--shadow);
-    padding: 0.5rem 0;
+    padding: 0.25rem 0; /* Reduced from 0.5rem to 0.25rem for even tighter when scrolled */
 }
 
 .navbar-brand {
@@ -175,7 +175,7 @@ p {
 }
 
 .navbar-brand img {
-    height: 100px !important; /* Increased from 80px to 100px */
+    height: 110px !important; /* Increased from 100px to 110px for better visibility */
     width: auto;
     max-width: none;
 }
@@ -183,7 +183,7 @@ p {
 /* Mobile logo sizing */
 @media (max-width: 768px) {
     .navbar-brand img {
-        height: 85px !important; /* Increased from 70px to 85px for mobile */
+        height: 90px !important; /* Increased from 85px to 90px for mobile */
     }
 }
 
