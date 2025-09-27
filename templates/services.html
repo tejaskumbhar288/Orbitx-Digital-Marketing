@@ -59,7 +59,7 @@
 <section class="services-grid">
     <div class="container">
         {% for service in services %}
-        <div class="service-section" id="{{ service.name.lower().replace(' ', '-').replace('&', '').replace(',', '') }}" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+        <div class="service-section" id="{{ service.name.lower().replace(' ', '-').replace('&', '').replace(',', '') }}" data-aos="fade-up" data-aos-delay="0">
             <div class="row align-items-center {{ 'flex-row-reverse' if loop.index % 2 == 0 else '' }}">
                 <div class="col-lg-6">
                     <div class="service-image">
@@ -184,7 +184,7 @@
         </div>
         
         <div class="row">
-            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up">
                 <div class="process-step">
                     <div class="step-icon">
                         <span class="step-number">1</span>
@@ -197,7 +197,7 @@
                 </div>
             </div>
             
-            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up">
                 <div class="process-step">
                     <div class="step-icon">
                         <span class="step-number">2</span>
@@ -210,7 +210,7 @@
                 </div>
             </div>
             
-            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up">
                 <div class="process-step">
                     <div class="step-icon">
                         <span class="step-number">3</span>
@@ -223,7 +223,7 @@
                 </div>
             </div>
             
-            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up">
                 <div class="process-step">
                     <div class="step-icon">
                         <span class="step-number">4</span>
@@ -252,7 +252,7 @@
         <div class="row">
             <div class="col-lg-8 mx-auto">
                 <div class="accordion" id="faqAccordion">
-                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="100">
+                    <div class="accordion-item" data-aos="fade-up">
                         <h2 class="accordion-header" id="faq1">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
                                 What's included in your logo design package?
@@ -265,7 +265,7 @@
                         </div>
                     </div>
                     
-                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="accordion-item" data-aos="fade-up">
                         <h2 class="accordion-header" id="faq2">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
                                 How long does it take to complete a project?
@@ -278,7 +278,7 @@
                         </div>
                     </div>
                     
-                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="300">
+                    <div class="accordion-item" data-aos="fade-up">
                         <h2 class="accordion-header" id="faq3">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
                                 Do you provide revisions?
@@ -291,7 +291,7 @@
                         </div>
                     </div>
                     
-                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="400">
+                    <div class="accordion-item" data-aos="fade-up">
                         <h2 class="accordion-header" id="faq4">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
                                 What file formats do you provide?
@@ -304,7 +304,7 @@
                         </div>
                     </div>
                     
-                    <div class="accordion-item" data-aos="fade-up" data-aos-delay="500">
+                    <div class="accordion-item" data-aos="fade-up">
                         <h2 class="accordion-header" id="faq5">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5">
                                 Do you work with international clients?
