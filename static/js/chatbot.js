@@ -84,10 +84,10 @@ class OrbitXChatbot {
                                 <div class="status-indicator-pulse"></div>
                             </div>
                             <div class="chat-title">
-                                <h4>OrbitX AI Assistant</h4>
+                                <h4>🤖 OrbitX AI Assistant</h4>
                                 <span class="chat-status">
                                     <span class="status-dot"></span>
-                                    Online • Ready to help with your projects
+                                    🔗 Online • AI-Powered Creative Assistant
                                 </span>
                             </div>
                         </div>
@@ -112,27 +112,27 @@ class OrbitXChatbot {
                                 <div class="message-bubble ai-bubble">
                                     <div class="bubble-glow"></div>
                                     <div class="bubble-content">
-                                        <p class="greeting-text">✨ Hello! I'm your OrbitX AI Assistant</p>
+                                        <p class="greeting-text">🤖 Hello! I'm your OrbitX AI Assistant</p>
                                         <p class="capabilities-intro">I'm here to help you with:</p>
                                         <div class="capability-grid">
                                             <div class="capability-item">
                                                 <span class="capability-icon">🎨</span>
-                                                <span>Design Projects</span>
+                                                <span>Creative Design</span>
                                             </div>
                                             <div class="capability-item">
-                                                <span class="capability-icon">💰</span>
-                                                <span>Instant Quotes</span>
+                                                <span class="capability-icon">⚡</span>
+                                                <span>Lightning Fast</span>
                                             </div>
                                             <div class="capability-item">
-                                                <span class="capability-icon">📁</span>
-                                                <span>Portfolio Showcase</span>
+                                                <span class="capability-icon">🤖</span>
+                                                <span>AI-Powered</span>
                                             </div>
                                             <div class="capability-item">
                                                 <span class="capability-icon">🚀</span>
-                                                <span>Project Launch</span>
+                                                <span>Next-Level Results</span>
                                             </div>
                                         </div>
-                                        <p class="cta-text">What creative project can I help you with today?</p>
+                                        <p class="cta-text">🌟 Ready to create something amazing together?</p>
                                     </div>
                                 </div>
                                 <div class="message-time">${this.formatTime(new Date())}</div>
@@ -141,29 +141,6 @@ class OrbitXChatbot {
                     </div>
 
                     <div class="chat-input-section">
-                        <!-- Smart Quick Actions -->
-                        <div class="smart-actions" id="quick-actions">
-                            <div class="action-category">
-                                <div class="action-buttons quick-action-grid">
-                                    <button class="smart-action primary compact" data-message="I need a professional logo design for my business">
-                                        <span class="action-icon">🎨</span>
-                                        <span class="action-text">Logo</span>
-                                    </button>
-                                    <button class="smart-action secondary compact" data-message="How much would a modern website cost?">
-                                        <span class="action-icon">💻</span>
-                                        <span class="action-text">Website</span>
-                                    </button>
-                                    <button class="smart-action tertiary compact" data-message="Show me your best portfolio work">
-                                        <span class="action-icon">✨</span>
-                                        <span class="action-text">Portfolio</span>
-                                    </button>
-                                    <button class="smart-action quaternary compact" data-message="What digital marketing services do you offer?">
-                                        <span class="action-icon">🚀</span>
-                                        <span class="action-text">Services</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- AI Thinking Indicator -->
                         <div class="ai-thinking-indicator" id="typing-indicator" style="display: none;">
@@ -221,7 +198,7 @@ class OrbitXChatbot {
                                         </span>
                                     </div>
                                     <div class="footer-right">
-                                        <span class="powered-by">Powered by OrbitX AI ✨</span>
+                                        <span class="powered-by">⚡ Powered by OrbitX AI 🤖</span>
                                     </div>
                                 </div>
                             </div>
@@ -241,18 +218,20 @@ class OrbitXChatbot {
     addChatbotStyles() {
         const styles = `
             <style>
-                /* ===== MODERN AI CHATBOT STYLES ===== */
+                /* ===== FUTURISTIC AI CHATBOT STYLES ===== */
                 :root {
-                    --chatbot-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    --chatbot-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-                    --chatbot-ai-glow: #4facfe;
-                    --chatbot-ai-core: #00f2fe;
-                    --chatbot-dark: #1a1a2e;
-                    --chatbot-dark-light: #16213e;
+                    --chatbot-primary: linear-gradient(135deg, #0066ff 0%, #ff0066 100%);
+                    --chatbot-secondary: linear-gradient(135deg, #ff0066 0%, #0066ff 100%);
+                    --chatbot-ai-glow: #00bfff;
+                    --chatbot-ai-core: #ff0066;
+                    --chatbot-dark: #0a0a1e;
+                    --chatbot-dark-light: #1a1a3e;
                     --chatbot-text: #ffffff;
                     --chatbot-text-muted: rgba(255, 255, 255, 0.7);
-                    --chatbot-glass: rgba(255, 255, 255, 0.1);
-                    --chatbot-border: rgba(255, 255, 255, 0.2);
+                    --chatbot-glass: rgba(0, 191, 255, 0.1);
+                    --chatbot-border: rgba(0, 191, 255, 0.3);
+                    --chatbot-robot-blue: #00bfff;
+                    --chatbot-robot-red: #ff0066;
                 }
 
                 .orbitx-chatbot {
@@ -295,9 +274,9 @@ class OrbitXChatbot {
                     width: 32px;
                     height: 32px;
                     border-radius: 50%;
-                    background: var(--chatbot-ai-glow);
-                    background: linear-gradient(45deg, var(--chatbot-ai-glow), var(--chatbot-ai-core));
+                    background: linear-gradient(45deg, var(--chatbot-robot-blue), var(--chatbot-robot-red));
                     animation: orbPulse 2s ease-in-out infinite;
+                    box-shadow: 0 0 20px var(--chatbot-robot-blue);
                 }
 
                 .orb-inner {
@@ -318,7 +297,7 @@ class OrbitXChatbot {
                     left: -10px;
                     right: -10px;
                     bottom: -10px;
-                    background: radial-gradient(circle, var(--chatbot-ai-glow) 0%, transparent 70%);
+                    background: radial-gradient(circle, var(--chatbot-robot-blue) 0%, var(--chatbot-robot-red) 50%, transparent 70%);
                     border-radius: 50%;
                     opacity: 0.6;
                     animation: glowPulse 2s ease-in-out infinite;
@@ -336,9 +315,10 @@ class OrbitXChatbot {
                     position: absolute;
                     width: 3px;
                     height: 3px;
-                    background: var(--chatbot-ai-core);
+                    background: var(--chatbot-robot-red);
                     border-radius: 50%;
                     opacity: 0.8;
+                    box-shadow: 0 0 4px var(--chatbot-robot-red);
                 }
 
                 .particle:nth-child(1) {
@@ -367,7 +347,7 @@ class OrbitXChatbot {
 
                 .chat-toggle:hover {
                     transform: scale(1.05);
-                    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--chatbot-ai-glow);
+                    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--chatbot-robot-blue), 0 0 30px var(--chatbot-robot-red);
                 }
 
                 .chat-toggle:hover .orb-core {
@@ -428,11 +408,11 @@ class OrbitXChatbot {
                 /* ===== MODERN CHAT WINDOW ===== */
                 .chat-window {
                     position: fixed;
-                    bottom: 100px;
+                    bottom: 20px;
                     right: 20px;
-                    width: 400px;
-                    height: calc(100vh - 160px);
-                    max-height: 720px;
+                    width: 420px;
+                    height: calc(100vh - 40px);
+                    max-height: 800px;
                     background: var(--chatbot-dark);
                     backdrop-filter: blur(20px);
                     border: 1px solid var(--chatbot-border);
@@ -494,13 +474,14 @@ class OrbitXChatbot {
                 .avatar-core {
                     width: 100%;
                     height: 100%;
-                    background: linear-gradient(45deg, var(--chatbot-ai-glow), var(--chatbot-ai-core));
+                    background: linear-gradient(45deg, var(--chatbot-robot-blue), var(--chatbot-robot-red));
                     border-radius: 50%;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     position: relative;
                     animation: avatarPulse 3s ease-in-out infinite;
+                    box-shadow: 0 0 15px var(--chatbot-robot-blue);
                 }
 
                 .avatar-inner {
@@ -523,9 +504,10 @@ class OrbitXChatbot {
                     position: absolute;
                     width: 4px;
                     height: 4px;
-                    background: var(--chatbot-text);
+                    background: var(--chatbot-robot-red);
                     border-radius: 50%;
                     opacity: 0.8;
+                    box-shadow: 0 0 4px var(--chatbot-robot-red);
                 }
 
                 .sparkle:nth-child(1) {
@@ -552,10 +534,11 @@ class OrbitXChatbot {
                     right: 2px;
                     width: 14px;
                     height: 14px;
-                    background: #00ff88;
+                    background: var(--chatbot-robot-blue);
                     border: 2px solid var(--chatbot-dark);
                     border-radius: 50%;
                     animation: statusPulse 2s ease-in-out infinite;
+                    box-shadow: 0 0 6px var(--chatbot-robot-blue);
                 }
 
                 @keyframes avatarPulse {
@@ -600,9 +583,10 @@ class OrbitXChatbot {
                 .status-dot {
                     width: 8px;
                     height: 8px;
-                    background: #00ff88;
+                    background: var(--chatbot-robot-blue);
                     border-radius: 50%;
                     animation: statusDotPulse 2s ease-in-out infinite;
+                    box-shadow: 0 0 4px var(--chatbot-robot-blue);
                 }
 
                 @keyframes statusDotPulse {
@@ -647,7 +631,7 @@ class OrbitXChatbot {
                 }
 
                 .chat-messages::-webkit-scrollbar-thumb:hover {
-                    background: var(--chatbot-ai-glow);
+                    background: var(--chatbot-robot-blue);
                 }
 
                 /* ===== MESSAGE STYLING ===== */
@@ -706,12 +690,13 @@ class OrbitXChatbot {
                 .message-orb-core {
                     width: 100%;
                     height: 100%;
-                    background: linear-gradient(45deg, var(--chatbot-ai-glow), var(--chatbot-ai-core));
+                    background: linear-gradient(45deg, var(--chatbot-robot-blue), var(--chatbot-robot-red));
                     border-radius: 50%;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     animation: messageOrbPulse 2s ease-in-out infinite;
+                    box-shadow: 0 0 10px var(--chatbot-robot-blue);
                 }
 
                 .message-orb-inner {
@@ -872,100 +857,6 @@ class OrbitXChatbot {
                     text-align: center;
                 }
 
-                /* ===== SMART ACTIONS ===== */\n\n                .quick-action-grid {\n                    grid-template-columns: 1fr 1fr 1fr 1fr;\n                    gap: 6px;\n                }\n\n                .smart-action.compact {\n                    padding: 8px 10px;\n                    flex-direction: column;\n                    text-align: center;\n                    gap: 4px;\n                }\n\n                .smart-action.compact .action-text {\n                    font-size: 11px;\n                }\n\n                .smart-action.compact .action-icon {\n                    font-size: 14px;\n                }
-                .smart-actions {
-                    padding: 20px 24px 16px;
-                    background: var(--chatbot-dark);
-                    border-top: 1px solid var(--chatbot-border);
-                }
-
-                .action-category {
-                    margin-bottom: 16px;
-                }
-
-                .action-category:last-child {
-                    margin-bottom: 0;
-                }
-
-                .category-label {
-                    font-size: 12px;
-                    color: var(--chatbot-text-muted);
-                    margin-bottom: 8px;
-                    font-weight: 500;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                }
-
-                .action-buttons {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 12px;
-                }
-
-                .smart-action {
-                    position: relative;
-                    background: var(--chatbot-glass);
-                    border: 1px solid var(--chatbot-border);
-                    border-radius: 16px;
-                    padding: 14px 16px;
-                    cursor: pointer;
-                    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-                    color: var(--chatbot-text);
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    overflow: hidden;
-                    backdrop-filter: blur(10px);
-                }
-
-                .smart-action:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-                    border-color: var(--chatbot-ai-glow);
-                }
-
-                .smart-action.primary:hover {
-                    background: linear-gradient(135deg, var(--chatbot-ai-glow), var(--chatbot-ai-core));
-                    color: var(--chatbot-dark);
-                }
-
-                .smart-action.secondary:hover {
-                    background: linear-gradient(135deg, #f093fb, #f5576c);
-                }
-
-                .smart-action.tertiary:hover {
-                    background: linear-gradient(135deg, #4facfe, #00f2fe);
-                }
-
-                .smart-action.quaternary:hover {
-                    background: linear-gradient(135deg, #43e97b, #38f9d7);
-                }
-
-                .action-icon {
-                    font-size: 18px;
-                    flex-shrink: 0;
-                }
-
-                .action-text {
-                    font-size: 13px;
-                    font-weight: 500;
-                    flex: 1;
-                }
-
-                .action-accent {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 2px;
-                    background: linear-gradient(90deg, transparent, var(--chatbot-ai-glow), transparent);
-                    opacity: 0;
-                    transition: opacity 0.3s ease;
-                }
-
-                .smart-action:hover .action-accent {
-                    opacity: 1;
-                }
 
                 /* ===== AI THINKING INDICATOR ===== */
                 .ai-thinking-indicator {
@@ -990,9 +881,10 @@ class OrbitXChatbot {
                 .thinking-core {
                     width: 100%;
                     height: 100%;
-                    background: linear-gradient(45deg, var(--chatbot-ai-glow), var(--chatbot-ai-core));
+                    background: linear-gradient(45deg, var(--chatbot-robot-blue), var(--chatbot-robot-red));
                     border-radius: 50%;
                     animation: thinkingPulse 1.5s ease-in-out infinite;
+                    box-shadow: 0 0 8px var(--chatbot-robot-blue);
                 }
 
                 .thinking-pulse {
@@ -1001,7 +893,7 @@ class OrbitXChatbot {
                     left: -4px;
                     right: -4px;
                     bottom: -4px;
-                    border: 2px solid var(--chatbot-ai-glow);
+                    border: 2px solid var(--chatbot-robot-blue);
                     border-radius: 50%;
                     opacity: 0.6;
                     animation: thinkingRipple 2s ease-in-out infinite;
@@ -1020,9 +912,10 @@ class OrbitXChatbot {
                 .thinking-dots .dot {
                     width: 8px;
                     height: 8px;
-                    background: var(--chatbot-ai-glow);
+                    background: var(--chatbot-robot-blue);
                     border-radius: 50%;
                     animation: thinkingBounce 1.4s infinite ease-in-out;
+                    box-shadow: 0 0 6px var(--chatbot-robot-blue);
                 }
 
                 .thinking-dots .dot:nth-child(1) { animation-delay: -0.32s; }
@@ -1079,8 +972,8 @@ class OrbitXChatbot {
                 }
 
                 .input-container:focus-within {
-                    border-color: var(--chatbot-ai-glow);
-                    box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+                    border-color: var(--chatbot-robot-blue);
+                    box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.2), 0 0 20px rgba(255, 0, 102, 0.1);
                 }
 
                 .modern-chat-input {
@@ -1122,7 +1015,7 @@ class OrbitXChatbot {
 
                 .modern-send-btn {
                     position: relative;
-                    background: linear-gradient(135deg, var(--chatbot-ai-glow), var(--chatbot-ai-core));
+                    background: linear-gradient(135deg, var(--chatbot-robot-blue), var(--chatbot-robot-red));
                     border: none;
                     border-radius: 50%;
                     width: 40px;
@@ -1134,11 +1027,12 @@ class OrbitXChatbot {
                     justify-content: center;
                     transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
                     overflow: hidden;
+                    box-shadow: 0 0 15px var(--chatbot-robot-blue);
                 }
 
                 .modern-send-btn:hover {
                     transform: scale(1.05);
-                    box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+                    box-shadow: 0 8px 25px rgba(0, 191, 255, 0.6), 0 0 20px var(--chatbot-robot-red);
                 }
 
                 .modern-send-btn:disabled {
@@ -1186,9 +1080,10 @@ class OrbitXChatbot {
                 .status-indicator-mini {
                     width: 6px;
                     height: 6px;
-                    background: #00ff88;
+                    background: var(--chatbot-robot-blue);
                     border-radius: 50%;
                     animation: miniStatusPulse 2s ease-in-out infinite;
+                    box-shadow: 0 0 4px var(--chatbot-robot-blue);
                 }
 
                 .powered-by {
@@ -1214,9 +1109,9 @@ class OrbitXChatbot {
 
                     .chat-window {
                         width: calc(100vw - 32px);
-                        height: calc(100vh - 120px);
+                        height: calc(100vh - 80px);
                         right: 16px;
-                        bottom: 84px;
+                        bottom: 16px;
                         max-height: none;
                         border-radius: 20px;
                     }
@@ -1313,7 +1208,6 @@ class OrbitXChatbot {
         const closeBtn = document.getElementById('chat-close');
         const sendBtn = document.getElementById('chat-send');
         const input = document.getElementById('chat-input');
-        const quickActions = document.getElementById('quick-actions');
 
         toggleBtn.addEventListener('click', () => this.toggleChat());
         closeBtn.addEventListener('click', () => this.closeChat());
@@ -1326,13 +1220,6 @@ class OrbitXChatbot {
             }
         });
 
-        // Quick action buttons
-        quickActions.addEventListener('click', (e) => {
-            if (e.target.classList.contains('quick-action')) {
-                const message = e.target.getAttribute('data-message');
-                this.sendQuickMessage(message);
-            }
-        });
 
         // Hide notification when chat is opened
         toggleBtn.addEventListener('click', () => {
