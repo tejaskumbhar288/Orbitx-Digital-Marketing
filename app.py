@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-from flask_sqlalchemy import SQLAlchemy
+from flask_pymongo import PyMongo
 from flask_mail import Mail, Message
-from models import db, Service, ContactInquiry, QuoteRequest, Testimonial, BlogPost, Portfolio, ChatConversation, ChatMessage
+from models_mongodb import DatabaseModels
 from forms import ContactForm, QuoteForm
+from pymongo import MongoClient
 import os
 from datetime import datetime
 import logging
@@ -23,20 +24,12 @@ app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
-# Database configuration with fallback
-database_url = os.environ.get('DATABASE_URL')
-if database_url and database_url.startswith('postgres://'):
-    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+# MongoDB configuration
+mongodb_uri = os.environ.get('MONGODB_URI') or os.environ.get('DATABASE_URL')
+if not mongodb_uri:
+    raise ValueError("MONGODB_URI not found in environment variables")
 
-# For Render deployment, use in-memory SQLite if no DATABASE_URL
-if database_url:
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-else:
-    # Create instance directory if it doesn't exist
-    instance_dir = os.path.join(basedir, "instance")
-    os.makedirs(instance_dir, exist_ok=True)
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(instance_dir, "database.db")}'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['MONGO_URI'] = mongodb_uri
 
 # Email configuration
 app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
@@ -51,8 +44,11 @@ app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER', 'static/uploads')
 app.config['MAX_CONTENT_LENGTH'] = int(os.environ.get('MAX_CONTENT_LENGTH', 16 * 1024 * 1024))
 
 # Initialize extensions
-db.init_app(app)
+mongo = PyMongo(app)
 mail = Mail(app)
+
+# Initialize MongoDB models
+db_models = DatabaseModels(mongo.db)
 
 # Initialize OpenAI client
 openai_client = None
@@ -240,9 +236,9 @@ Action: Send quote to {quote_data.get('email')}"""
 @app.route('/')
 def index():
     """Homepage with featured services and portfolio items"""
-    services = Service.query.filter_by(is_active=True).limit(6).all()
-    portfolio_items = Portfolio.query.filter_by(is_featured=True).limit(8).all()
-    testimonials = Testimonial.query.filter_by(is_featured=True).limit(3).all()
+    services = db_models.services.get_active_services(limit=6)
+    portfolio_items = db_models.portfolio.get_featured(limit=8)
+    testimonials = db_models.testimonials.get_featured(limit=3)
     return render_template('index.html',
                          services=services,
                          portfolio_items=portfolio_items,
@@ -256,14 +252,16 @@ def about():
 @app.route('/services')
 def services():
     """Services listing page"""
-    services = Service.query.filter_by(is_active=True).all()
+    services = db_models.services.get_active_services()
     return render_template('services.html', services=services)
 
-@app.route('/service/<int:service_id>')
+@app.route('/service/<string:service_id>')
 def service_detail(service_id):
     """Individual service detail page"""
-    service = Service.query.get_or_404(service_id)
-    related_portfolio = Portfolio.query.filter_by(service_id=service_id).limit(6).all()
+    service = db_models.services.get_by_id(service_id)
+    if not service:
+        return render_template('errors/404.html'), 404
+    related_portfolio = db_models.portfolio.get_by_service(service_id, limit=6)
     return render_template('service_detail.html', service=service, related_portfolio=related_portfolio)
 
 @app.route('/portfolio')
@@ -272,15 +270,12 @@ def portfolio():
     service_filter = request.args.get('service', 'all')
 
     if service_filter == 'all':
-        portfolio_items = Portfolio.query.all()
+        portfolio_items = db_models.portfolio.find()
     else:
-        try:
-            service_id = int(service_filter)
-            portfolio_items = Portfolio.query.filter_by(service_id=service_id).all()
-        except ValueError:
-            portfolio_items = Portfolio.query.all()
+        # service_filter is now a string (MongoDB ObjectId)
+        portfolio_items = db_models.portfolio.get_by_service(service_filter)
 
-    services = Service.query.filter_by(is_active=True).all()
+    services = db_models.services.get_active_services()
     return render_template('portfolio.html',
                          portfolio_items=portfolio_items,
                          services=services,
@@ -289,16 +284,15 @@ def portfolio():
 @app.route('/case-studies')
 def case_studies():
     """Case studies listing"""
-    case_studies = Portfolio.query.filter(
-        Portfolio.challenge.isnot(None),
-        Portfolio.solution.isnot(None)
-    ).all()
+    case_studies = db_models.portfolio.get_case_studies()
     return render_template('case_studies.html', case_studies=case_studies)
 
-@app.route('/case-study/<int:case_study_id>')
+@app.route('/case-study/<string:case_study_id>')
 def case_study_detail(case_study_id):
     """Individual case study detail"""
-    case_study = Portfolio.query.get_or_404(case_study_id)
+    case_study = db_models.portfolio.find_one({'_id': case_study_id})
+    if not case_study:
+        return render_template('errors/404.html'), 404
     return render_template('case_study_detail.html', case_study=case_study)
 
 @app.route('/contact', methods=['GET', 'POST'])
@@ -307,19 +301,16 @@ def contact():
     form = ContactForm()
 
     if form.validate_on_submit():
-        # Create contact inquiry
-        inquiry = ContactInquiry(
-            name=form.name.data,
-            email=form.email.data,
-            phone=form.phone.data,
-            service_interested=form.service_interested.data,
-            message=form.message.data,
-            status='new'
-        )
-
         try:
-            db.session.add(inquiry)
-            db.session.commit()
+            # Create contact inquiry
+            inquiry_id = db_models.contact_inquiries.create_inquiry(
+                name=form.name.data,
+                email=form.email.data,
+                phone=form.phone.data,
+                service_interested=form.service_interested.data,
+                message=form.message.data,
+                status='new'
+            )
 
             # Send email notification
             if app.config['MAIL_USERNAME']:
@@ -348,7 +339,6 @@ Reply to this inquiry as soon as possible.
             return redirect(url_for('contact'))
 
         except Exception as e:
-            db.session.rollback()
             app.logger.error(f"Database error: {e}")
             flash('Sorry, there was an error submitting your message. Please try again.', 'error')
 
@@ -360,37 +350,37 @@ def quote():
     form = QuoteForm()
 
     if request.method == 'POST':
-        # Create quote request from raw form data
-        quote_request = QuoteRequest(
-            client_name=request.form.get('client_name'),
-            email=request.form.get('email'),
-            phone=request.form.get('phone'),
-            company_name=request.form.get('company_name'),
-            services_requested=request.form.get('services_requested'),
-            project_description=request.form.get('project_description'),
-            budget_range=request.form.get('budget_range'),
-            timeline=request.form.get('timeline'),
-            additional_requirements=request.form.get('additional_requirements'),
-            status='pending'
-        )
-
         try:
-            db.session.add(quote_request)
-            db.session.commit()
+            # Create quote request from raw form data
+            quote_request_id = db_models.quote_requests.create_quote_request(
+                client_name=request.form.get('client_name'),
+                email=request.form.get('email'),
+                phone=request.form.get('phone'),
+                company_name=request.form.get('company_name'),
+                services_requested=request.form.get('services_requested'),
+                project_description=request.form.get('project_description'),
+                budget_range=request.form.get('budget_range'),
+                timeline=request.form.get('timeline'),
+                additional_requirements=request.form.get('additional_requirements'),
+                status='pending'
+            )
+
+            # Get the created quote request for further processing
+            quote_request = db_models.quote_requests.get_by_id(quote_request_id)
 
             # Send AI-enhanced WhatsApp notification
             try:
                 # Prepare quote data for AI analysis
                 quote_data = {
-                    'client_name': quote_request.client_name,
-                    'email': quote_request.email,
-                    'phone': quote_request.phone,
-                    'company_name': quote_request.company_name,
-                    'services_requested': quote_request.services_requested,
-                    'project_description': quote_request.project_description,
-                    'budget_range': quote_request.budget_range,
-                    'timeline': quote_request.timeline,
-                    'additional_requirements': quote_request.additional_requirements
+                    'client_name': quote_request.get('client_name'),
+                    'email': quote_request.get('email'),
+                    'phone': quote_request.get('phone'),
+                    'company_name': quote_request.get('company_name'),
+                    'services_requested': quote_request.get('services_requested'),
+                    'project_description': quote_request.get('project_description'),
+                    'budget_range': quote_request.get('budget_range'),
+                    'timeline': quote_request.get('timeline'),
+                    'additional_requirements': quote_request.get('additional_requirements')
                 }
 
                 # Run AI analysis and generate enhanced message
@@ -409,12 +399,12 @@ def quote():
                         # Open WhatsApp Web
                         webbrowser.open(whatsapp_url)
 
-                        app.logger.info(f"AI-enhanced WhatsApp URL opened for {quote_request.client_name} - Priority: {analysis['priority']}/10")
+                        app.logger.info(f"AI-enhanced WhatsApp URL opened for {quote_request.get('client_name')} - Priority: {analysis['priority']}/10")
 
                     except Exception as e:
                         app.logger.error(f"AI analysis failed: {e}")
                         # Fallback to basic message
-                        basic_message = f"NEW QUOTE REQUEST - OrbitX\nClient: {quote_request.client_name}\nEmail: {quote_request.email}\nService: {quote_request.services_requested}"
+                        basic_message = f"NEW QUOTE REQUEST - OrbitX\nClient: {quote_request.get('client_name')}\nEmail: {quote_request.get('email')}\nService: {quote_request.get('services_requested')}"
                         encoded_message = urllib.parse.quote(basic_message)
                         whatsapp_url = f"https://wa.me/{os.getenv('TARGET_WHATSAPP_NUMBER', '919518536672')}?text={encoded_message}"
                         webbrowser.open(whatsapp_url)
@@ -430,7 +420,6 @@ def quote():
             return redirect(url_for('quote'))
 
         except Exception as e:
-            db.session.rollback()
             app.logger.error(f"Database error: {e}")
             flash('Sorry, there was an error submitting your request. Please try again.', 'error')
 
@@ -451,7 +440,7 @@ def simple_quote_submission():
         else:
             data = request.form
 
-        quote_request = QuoteRequest(
+        quote_request_id = db_models.quote_requests.create_quote_request(
             client_name=data.get('client_name'),
             email=data.get('email'),
             phone=data.get('phone'),
@@ -464,20 +453,20 @@ def simple_quote_submission():
             status='pending'
         )
 
-        db.session.add(quote_request)
-        db.session.commit()
+        # Get the created quote request
+        quote_request = db_models.quote_requests.get_by_id(quote_request_id)
 
         # Process with AI-enhanced messaging
         quote_data = {
-            'client_name': quote_request.client_name,
-            'email': quote_request.email,
-            'phone': quote_request.phone,
-            'company_name': quote_request.company_name,
-            'services_requested': quote_request.services_requested,
-            'project_description': quote_request.project_description,
-            'budget_range': quote_request.budget_range,
-            'timeline': quote_request.timeline,
-            'additional_requirements': quote_request.additional_requirements
+            'client_name': quote_request.get('client_name'),
+            'email': quote_request.get('email'),
+            'phone': quote_request.get('phone'),
+            'company_name': quote_request.get('company_name'),
+            'services_requested': quote_request.get('services_requested'),
+            'project_description': quote_request.get('project_description'),
+            'budget_range': quote_request.get('budget_range'),
+            'timeline': quote_request.get('timeline'),
+            'additional_requirements': quote_request.get('additional_requirements')
         }
 
         # Background AI processing with SMS
@@ -490,9 +479,9 @@ def simple_quote_submission():
                 sms_sent = send_sms_notification(quote_data, analysis)
 
                 if sms_sent:
-                    app.logger.info(f"SMS quote notification sent for {quote_request.client_name} - Priority: {analysis['priority']}/10")
+                    app.logger.info(f"SMS quote notification sent for {quote_request.get('client_name')} - Priority: {analysis['priority']}/10")
                 else:
-                    app.logger.warning(f"SMS failed for {quote_request.client_name} - using fallback")
+                    app.logger.warning(f"SMS failed for {quote_request.get('client_name')} - using fallback")
                     # Fallback to WhatsApp if SMS fails
                     ai_message = asyncio.run(generate_ai_enhanced_whatsapp_message(quote_data, analysis))
                     import urllib.parse
@@ -500,7 +489,7 @@ def simple_quote_submission():
                     whatsapp_url = f"https://wa.me/{os.getenv('TARGET_WHATSAPP_NUMBER', '919518536672')}?text={encoded_message}"
                     import webbrowser
                     webbrowser.open(whatsapp_url)
-                    app.logger.info(f"WhatsApp fallback used for {quote_request.client_name}")
+                    app.logger.info(f"WhatsApp fallback used for {quote_request.get('client_name')}")
 
             except Exception as e:
                 app.logger.error(f"Quote processing failed: {e}")
@@ -511,41 +500,42 @@ def simple_quote_submission():
         return jsonify({
             "success": True,
             "message": "Quote submitted successfully",
-            "quote_id": quote_request.id
+            "quote_id": quote_request_id
         })
 
     except Exception as e:
-        db.session.rollback()
         app.logger.error(f"Simple quote submission error: {e}")
         return jsonify({
             "success": False,
             "error": str(e)
         }), 500
 
-@app.route('/admin/whatsapp/<int:quote_id>')
+@app.route('/admin/whatsapp/<string:quote_id>')
 def admin_whatsapp_quote(quote_id):
     """Admin route to open WhatsApp with quote details"""
-    quote_request = QuoteRequest.query.get_or_404(quote_id)
+    quote_request = db_models.quote_requests.get_by_id(quote_id)
+    if not quote_request:
+        return render_template('errors/404.html'), 404
 
     # Prepare WhatsApp message
     whatsapp_message = f"""🎯 NEW QUOTE REQUEST - OrbitX
 
-👤 Client: {quote_request.client_name}
-📧 Email: {quote_request.email}
-📱 Phone: {quote_request.phone or 'Not provided'}
-🏢 Company: {quote_request.company_name or 'Not provided'}
+👤 Client: {quote_request.get('client_name')}
+📧 Email: {quote_request.get('email')}
+📱 Phone: {quote_request.get('phone') or 'Not provided'}
+🏢 Company: {quote_request.get('company_name') or 'Not provided'}
 
-🛠️ Service: {quote_request.services_requested}
-💰 Budget: {quote_request.budget_range or 'Not specified'}
-⏰ Timeline: {quote_request.timeline or 'Not specified'}
+🛠️ Service: {quote_request.get('services_requested')}
+💰 Budget: {quote_request.get('budget_range') or 'Not specified'}
+⏰ Timeline: {quote_request.get('timeline') or 'Not specified'}
 
 📝 Project Description:
-{quote_request.project_description}
+{quote_request.get('project_description')}
 
 📋 Additional Requirements:
-{quote_request.additional_requirements or 'None specified'}
+{quote_request.get('additional_requirements') or 'None specified'}
 
-⚡ Action Required: Prepare and send detailed quote to {quote_request.email}"""
+⚡ Action Required: Prepare and send detailed quote to {quote_request.get('email')}"""
 
     # URL encode the message for WhatsApp
     encoded_message = urllib.parse.quote(whatsapp_message)
@@ -556,27 +546,31 @@ def admin_whatsapp_quote(quote_id):
 @app.route('/blog')
 def blog():
     """Blog listing page"""
-    posts = BlogPost.query.filter_by(is_published=True).order_by(BlogPost.created_at.desc()).all()
+    posts = db_models.blog_posts.get_published()
     return render_template('blog.html', posts=posts)
 
 @app.route('/blog/<slug>')
 def blog_post(slug):
     """Individual blog post"""
-    post = BlogPost.query.filter_by(slug=slug, is_published=True).first_or_404()
+    post = db_models.blog_posts.get_by_slug(slug)
+    if not post:
+        return render_template('errors/404.html'), 404
     return render_template('blog_post.html', post=post)
 
 # API endpoints for AJAX requests
-@app.route('/api/portfolio/<int:item_id>')
+@app.route('/api/portfolio/<string:item_id>')
 def api_portfolio_item(item_id):
     """API endpoint for portfolio item details"""
-    item = Portfolio.query.get_or_404(item_id)
+    item = db_models.portfolio.find_one({'_id': item_id})
+    if not item:
+        return jsonify({'error': 'Portfolio item not found'}), 404
     return jsonify({
-        'id': item.id,
-        'title': item.title,
-        'description': item.description,
-        'image_url': item.image_url,
-        'client_name': item.client_name,
-        'tags': item.tags
+        'id': item.get('id'),
+        'title': item.get('title'),
+        'description': item.get('description'),
+        'image_url': item.get('image_url'),
+        'client_name': item.get('client_name'),
+        'tags': item.get('tags')
     })
 
 # Favicon route
@@ -592,7 +586,7 @@ def not_found_error(error):
 
 @app.errorhandler(500)
 def internal_error(error):
-    db.session.rollback()
+    app.logger.error(f"Internal server error: {error}")
     return render_template('errors/500.html'), 500
 
 # Chatbot API endpoints
@@ -651,16 +645,16 @@ def chatbot_history(conversation_id):
 def chatbot_services():
     """Get available services for chatbot"""
     try:
-        services = Service.query.filter_by(is_active=True).all()
+        services = db_models.services.get_active_services()
         return jsonify({
             'success': True,
             'services': [
                 {
-                    'id': service.id,
-                    'name': service.name,
-                    'description': service.short_description or service.description[:100],
-                    'price_range': service.price_range,
-                    'icon': service.icon_class
+                    'id': service.get('id'),
+                    'name': service.get('name'),
+                    'description': service.get('short_description') or service.get('description', '')[:100],
+                    'price_range': service.get('price_range'),
+                    'icon': service.get('icon_class')
                 }
                 for service in services
             ]
@@ -673,60 +667,88 @@ def chatbot_services():
 def chatbot_portfolio():
     """Get portfolio items for chatbot"""
     try:
-        portfolio_items = Portfolio.query.filter_by(is_featured=True).limit(6).all()
+        portfolio_items = db_models.portfolio.get_featured(limit=6)
+        portfolio_list = []
+        for item in portfolio_items:
+            # Get service name if service_id exists
+            service_name = ''
+            if item.get('service_id'):
+                service = db_models.services.get_by_id(item.get('service_id'))
+                service_name = service.get('name', '') if service else ''
+
+            portfolio_list.append({
+                'id': item.get('id'),
+                'title': item.get('title'),
+                'description': item.get('description', '')[:100] if item.get('description') else '',
+                'client_name': item.get('client_name'),
+                'service': service_name,
+                'image_url': item.get('image_url'),
+                'tags': db_models.portfolio.get_tags_list(item)
+            })
+
         return jsonify({
             'success': True,
-            'portfolio': [
-                {
-                    'id': item.id,
-                    'title': item.title,
-                    'description': item.description[:100] if item.description else '',
-                    'client_name': item.client_name,
-                    'service': item.service.name if item.service else '',
-                    'image_url': item.image_url,
-                    'tags': item.get_tags_list()
-                }
-                for item in portfolio_items
-            ]
+            'portfolio': portfolio_list
         })
     except Exception as e:
         app.logger.error(f"Portfolio API error: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+# Template helper functions for MongoDB dict compatibility
+def get_tags_list_helper(portfolio_item):
+    """Helper function to get tags as list for portfolio items"""
+    if isinstance(portfolio_item, dict) and portfolio_item.get('tags'):
+        return [tag.strip() for tag in portfolio_item['tags'].split(',')]
+    return []
+
+def get_service_name_helper(service_id):
+    """Helper function to get service name by ID"""
+    if not service_id:
+        return ''
+    service = db_models.services.get_by_id(service_id)
+    return service.get('name', '') if service else ''
 
 # Context processors for global template variables
 @app.context_processor
 def inject_globals():
     return {
         'current_year': datetime.now().year,
-        'site_name': 'OrbitX'
+        'site_name': 'OrbitX',
+        'get_tags_list': get_tags_list_helper,
+        'get_service_name': get_service_name_helper
     }
 
-# Create database tables on startup - always run this
+# Initialize MongoDB database and create indexes
 try:
     with app.app_context():
-        db.create_all()
-        print("Database tables created successfully!")
+        print("Initializing MongoDB database...")
+
+        # Create indexes for better performance
+        db_models.create_indexes()
 
         # Initialize comprehensive data if database is empty
-        if not Service.query.first():
+        if db_models.services.count_documents() == 0:
             print("Initializing comprehensive website data...")
             # Import and run the comprehensive data population
             try:
-                from populate_data import populate_all_data
-                populate_all_data()
+                from populate_data_mongodb import populate_mongodb_data
+                populate_mongodb_data(db_models)
                 print("Comprehensive data initialization completed!")
             except Exception as populate_error:
                 print(f"Error with comprehensive data population: {populate_error}")
                 # Fallback to basic services if comprehensive population fails
                 print("Falling back to basic service creation...")
+
                 basic_services = [
-                    Service(name='Logo Design', description='Professional logo design', icon_class='fas fa-palette', price_range='₹2,000 - ₹15,000', is_active=True),
-                    Service(name='Website Design', description='Modern website development', icon_class='fas fa-laptop-code', price_range='₹10,000 - ₹50,000', is_active=True),
-                    Service(name='Social Media Design', description='Social media graphics', icon_class='fas fa-share-alt', price_range='₹5,000 - ₹20,000', is_active=True)
+                    {'name': 'Logo Design', 'description': 'Professional logo design', 'icon_class': 'fas fa-palette', 'price_range': '₹2,000 - ₹15,000', 'is_active': True},
+                    {'name': 'Website Design', 'description': 'Modern website development', 'icon_class': 'fas fa-laptop-code', 'price_range': '₹10,000 - ₹50,000', 'is_active': True},
+                    {'name': 'Social Media Design', 'description': 'Social media graphics', 'icon_class': 'fas fa-share-alt', 'price_range': '₹5,000 - ₹20,000', 'is_active': True}
                 ]
-                for service in basic_services:
-                    db.session.add(service)
-                db.session.commit()
+
+                for service_data in basic_services:
+                    db_models.services.create_service(**service_data)
+
+                print("Basic services created successfully!")
         else:
             print("Database already has data, skipping initialization")
 

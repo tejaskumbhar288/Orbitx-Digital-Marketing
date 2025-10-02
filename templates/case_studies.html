@@ -102,7 +102,7 @@
                             </div>
                             <div class="client-details">
                                 <h3 class="client-name">{{ case_study.client_name }}</h3>
-                                <span class="industry">{{ case_study.service.name }}</span>
+                                <span class="industry">{{ get_service_name(case_study.service_id) }}</span>
                             </div>
                         </div>
                         
@@ -140,7 +140,7 @@
                         {% endif %}
                         
                         <div class="case-cta">
-                            <a href="{{ url_for('quote') }}?service={{ case_study.service.name }}" class="btn btn-primary me-3">
+                            <a href="{{ url_for('quote') }}?service={{ get_service_name(case_study.service_id) }}" class="btn btn-primary me-3">
                                 <i class="fas fa-quote-right me-2"></i>Get Similar Results
                             </a>
                             <a href="{{ url_for('portfolio') }}?service={{ case_study.service_id }}" class="btn btn-outline-primary">

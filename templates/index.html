@@ -190,7 +190,7 @@
                     <div class="portfolio-content">
                         <h4 class="portfolio-title">{{ item.title }}</h4>
                         <p class="portfolio-client">{{ item.client_name }}</p>
-                        <span class="portfolio-category">{{ item.service.name }}</span>
+                        <span class="portfolio-category">{{ get_service_name(item.service_id) }}</span>
                     </div>
                 </div>
             </div>

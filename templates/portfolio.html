@@ -85,7 +85,7 @@
                                 <h4 class="portfolio-title">{{ item.title }}</h4>
                                 <p class="portfolio-client">{{ item.client_name }}</p>
                                 <div class="portfolio-tags">
-                                    {% for tag in item.get_tags_list() %}
+                                    {% for tag in get_tags_list(item) %}
                                     <span class="tag">{{ tag }}</span>
                                     {% endfor %}
                                 </div>
@@ -103,11 +103,11 @@
                     <div class="portfolio-info">
                         <div class="info-top">
                             <h5 class="portfolio-title">{{ item.title }}</h5>
-                            <span class="portfolio-category">{{ item.service.name }}</span>
+                            <span class="portfolio-category">{{ get_service_name(item.service_id) }}</span>
                         </div>
                         <p class="portfolio-client">{{ item.client_name }}</p>
                         {% if item.project_date %}
-                        <small class="portfolio-date">{{ item.project_date.strftime('%B %Y') }}</small>
+                        <small class="portfolio-date">{{ item.project_date }}</small>
                         {% endif %}
                     </div>
                 </div>

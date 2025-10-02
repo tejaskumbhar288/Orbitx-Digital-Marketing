@@ -4,13 +4,14 @@ import asyncio
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 from flask import current_app
-from models import db, ChatConversation, ChatMessage, QuoteRequest, Service, Portfolio
+from models_mongodb import DatabaseModels
 import openai
 import re
 
 class OrbitXChatbot:
-    def __init__(self, openai_client):
+    def __init__(self, openai_client, db_models):
         self.openai_client = openai_client
+        self.db_models = db_models
         self.system_prompt = """You are OrbitX AI Assistant, a helpful and professional chatbot for OrbitX Design - a digital marketing and design agency.
 
 Your capabilities:
@@ -48,513 +49,366 @@ CRITICAL QUOTE CREATION WORKFLOW:
 5. When user says "yes" or "create quote": Confirm quote creation
 6. NEVER mention payments - only mention that team will contact via WhatsApp
 
-Current conversation context: {context}
-"""
+Key phrases that trigger quote creation:
+- "quote", "price", "cost", "how much", "estimate", "proposal"
+- Service names: "logo", "website", "branding", "social media", etc.
 
-    def get_ai_response(self, user_message: str, conversation_context: Dict) -> str:
-        """Get AI response using OpenAI"""
-        try:
-            context_str = json.dumps(conversation_context, indent=2)
+Response Style:
+- Use emojis sparingly and professionally: 👋 💡 ✨ 🎨 📧
+- Keep responses under 100 words when possible
+- Use bullet points for clarity when listing options
+- Always end with a clear next step or question
 
-            messages = [
-                {"role": "system", "content": self.system_prompt.format(context=context_str)},
-                {"role": "user", "content": user_message}
-            ]
+Remember: Your goal is to efficiently convert conversations into quote requests while providing excellent customer service."""
 
-            # Add recent conversation history
-            if 'recent_messages' in conversation_context:
-                for msg in conversation_context['recent_messages'][-6:]:  # Last 6 messages
-                    role = "assistant" if msg['sender'] == 'bot' else "user"
-                    messages.insert(-1, {"role": role, "content": msg['message']})
+        # Service keywords for detection
+        self.service_keywords = {
+            'logo': ['logo', 'brand mark', 'brand identity'],
+            'website': ['website', 'web design', 'site', 'online presence'],
+            'social media': ['social media', 'instagram', 'facebook', 'social posts'],
+            'branding': ['branding', 'brand package', 'brand identity', 'visual identity'],
+            'packaging': ['packaging', 'product packaging', 'box design'],
+            'print': ['print', 'brochure', 'flyer', 'business card', 'stationery']
+        }
 
-            response = self.openai_client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=messages,
-                max_tokens=500,
-                temperature=0.7
-            )
+        # Quote trigger keywords
+        self.quote_keywords = [
+            'quote', 'price', 'pricing', 'cost', 'how much', 'estimate',
+            'proposal', 'budget', 'charge', 'fee', 'rates'
+        ]
 
-            return response.choices[0].message.content.strip()
-
-        except Exception as e:
-            current_app.logger.error(f"OpenAI API error: {e}")
-            return "I apologize, but I'm experiencing technical difficulties. Please try again in a moment or contact us directly."
-
-    def extract_intent_and_entities(self, message: str) -> Dict:
-        """Extract user intent and relevant entities from message"""
+    def _detect_intent(self, message: str, context: Dict) -> Dict:
+        """Detect user intent from message"""
         message_lower = message.lower()
 
+        intent = {
+            'type': 'general',
+            'confidence': 0.5,
+            'services': [],
+            'wants_quote': False,
+            'has_contact_info': False
+        }
+
         # Service type detection
-        services = {
-            'logo': ['logo', 'brand mark', 'company logo'],
-            'website': ['website', 'web design', 'site', 'web development'],
-            'social_media': ['social media', 'instagram', 'facebook', 'twitter', 'social'],
-            'branding': ['branding', 'brand identity', 'brand package'],
-            'packaging': ['packaging', 'product packaging', 'box design'],
-            'print': ['print', 'brochure', 'flyer', 'poster', 'business card']
-        }
-
-        detected_services = []
-        for service, keywords in services.items():
+        for service_type, keywords in self.service_keywords.items():
             if any(keyword in message_lower for keyword in keywords):
-                detected_services.append(service)
+                intent['services'].append(service_type)
+                intent['type'] = 'service_inquiry'
+                intent['confidence'] = 0.8
 
-        # Intent detection
-        intents = {
-            'get_quote': ['quote', 'price', 'cost', 'how much', 'pricing'],
-            'start_project': ['start', 'begin', 'create', 'need', 'want'],
-            'get_info': ['what', 'how', 'tell me', 'information', 'about'],
-            'check_status': ['status', 'progress', 'update'],
-            'portfolio': ['portfolio', 'examples', 'work', 'previous']
-        }
+        # Quote intent detection
+        if any(keyword in message_lower for keyword in self.quote_keywords):
+            intent['wants_quote'] = True
+            intent['type'] = 'quote_request'
+            intent['confidence'] = 0.9
 
-        detected_intent = 'general'
-        for intent, keywords in intents.items():
-            if any(keyword in message_lower for keyword in keywords):
-                detected_intent = intent
-                break
+        # Contact info detection
+        email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+        if re.search(email_pattern, message) or '@' in message:
+            intent['has_contact_info'] = True
 
-        # Extract budget if mentioned
-        budget_match = re.search(r'₹?(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:k|thousand|lakh)?', message_lower)
-        budget = budget_match.group(1) if budget_match else None
-
-        return {
-            'intent': detected_intent,
-            'services': detected_services,
-            'budget': budget,
-            'entities': {
-                'has_timeline': any(word in message_lower for word in ['urgent', 'asap', 'quickly', 'soon', 'week', 'month']),
-                'has_company': any(word in message_lower for word in ['company', 'business', 'startup', 'brand'])
-            }
-        }
+        return intent
 
     def process_message(self, conversation_id: str, user_message: str, user_info: Dict = None) -> Dict:
         """Process user message and return bot response"""
         try:
             # Get or create conversation
-            conversation = ChatConversation.query.get(conversation_id)
+            conversation = self.db_models.chat_conversations.find_one({'_id': conversation_id})
             if not conversation:
-                conversation = ChatConversation(
-                    id=conversation_id,
+                self.db_models.chat_conversations.create_conversation(
+                    conversation_id=conversation_id,
                     user_session_id=user_info.get('session_id') if user_info else None,
                     user_name=user_info.get('name') if user_info else None,
                     user_email=user_info.get('email') if user_info else None,
                     user_phone=user_info.get('phone') if user_info else None,
                     context_data=json.dumps({})
                 )
-                db.session.add(conversation)
+                # Re-fetch to get the created conversation
+                conversation = self.db_models.chat_conversations.find_one({'_id': conversation_id})
 
             # Save user message
-            user_msg = ChatMessage(
+            self.db_models.chat_messages.create_message(
                 conversation_id=conversation_id,
                 sender='user',
                 message=user_message,
                 message_type='text'
             )
-            db.session.add(user_msg)
 
             # Get conversation context
-            context_data = json.loads(conversation.context_data or '{}')
+            context_data = json.loads(conversation.get('context_data', '{}'))
 
             # Get recent messages for context
-            recent_messages = db.session.query(ChatMessage).filter_by(
-                conversation_id=conversation_id
-            ).order_by(ChatMessage.created_at.desc()).limit(10).all()
+            recent_messages = self.db_models.chat_messages.get_by_conversation(conversation_id, limit=10)
 
-            context_data['recent_messages'] = [
-                {
-                    'sender': msg.sender,
-                    'message': msg.message,
-                    'timestamp': msg.created_at.isoformat()
-                }
-                for msg in reversed(recent_messages)
-            ]
+            # Detect intent
+            intent = self._detect_intent(user_message, context_data)
 
-            # Extract intent and entities
-            analysis = self.extract_intent_and_entities(user_message)
-            context_data['last_intent'] = analysis['intent']
+            # Update context with extracted information
+            context_data = self._update_context(user_message, context_data, intent)
 
-            # Combine current and previously detected services
-            current_services = analysis['services']
-            previous_services = context_data.get('detected_services', [])
+            # Generate response
+            messages_for_ai = self._prepare_messages_for_ai(recent_messages, context_data)
 
-            # Also extract services from recent conversation history
-            conversation_services = []
-            for msg in context_data.get('recent_messages', []):
-                if msg['sender'] == 'user':
-                    msg_analysis = self.extract_intent_and_entities(msg['message'])
-                    conversation_services.extend(msg_analysis['services'])
+            try:
+                response = self.openai_client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=messages_for_ai,
+                    max_tokens=300,
+                    temperature=0.7
+                )
+                bot_response = response.choices[0].message.content
+            except Exception as e:
+                current_app.logger.error(f"OpenAI API error: {e}")
+                bot_response = "I'm having some technical difficulties. Let me connect you with our team directly. Please share your contact details and project requirements."
 
-            all_services = list(set(current_services + previous_services + conversation_services))
-            context_data['detected_services'] = all_services
-            analysis['services'] = all_services  # Update analysis with combined services
-
-            # Update user info if provided in request
-            if user_info:
-                for key, value in user_info.items():
-                    if value:
-                        context_data[f'user_{key}'] = value
-
-            # Extract user info from current message
-            extracted_info = self.extract_user_info_from_message(user_message)
-            for key, value in extracted_info.items():
-                if value and not context_data.get(f'user_{key}'):  # Only update if not already set
-                    context_data[f'user_{key}'] = value
-
-            # Check for quote confirmation keywords
-            quote_confirmation_words = ['yes', 'create quote', 'proceed', 'go ahead', 'confirm', 'approve', 'finalize']
-            if any(word in user_message.lower() for word in quote_confirmation_words):
-                if context_data.get('user_name') and context_data.get('user_email') and (analysis['services'] or context_data.get('detected_services')):
-                    context_data['quote_confirmed'] = True
-
-            # Also check if AI response suggests creating a quote and user agreed
-            if analysis['intent'] == 'get_quote' and any(word in user_message.lower() for word in ['yes', 'confirm', 'proceed']):
-                context_data['quote_confirmed'] = True
-
-            # Generate AI response
-            bot_response = self.get_ai_response(user_message, context_data)
-
-            # Check if we should create a quote request or guide user for missing info
-            should_create_quote = self._has_sufficient_quote_info(context_data, analysis)
-            missing_info = self._get_missing_quote_info(context_data, analysis)
-
+            # Handle quote creation
             quote_request_id = None
-            if should_create_quote:
-                current_app.logger.info(f"🚀 Creating quote for: {context_data.get('user_name')} - Services: {analysis['services']}")
-                quote_request_id = self._create_quote_request(conversation, context_data, analysis)
-                bot_response += "\n\n✅ I've created a quote request for you! Our team will review your requirements and send you a detailed proposal within 2 hours."
-
-                # Send SMS notification immediately (without background thread)
+            if self._should_create_quote(user_message, context_data, intent):
                 try:
-                    quote_request = QuoteRequest.query.get(quote_request_id)
-                    if quote_request:
-                        current_app.logger.info(f"📞 Attempting to send SMS for quote ID: {quote_request_id}")
-                        sms_success = self._send_sms_directly(quote_request, analysis)
-                        if sms_success:
-                            current_app.logger.info(f"📱 SMS notification sent successfully for: {quote_request.client_name}")
-                        else:
-                            current_app.logger.warning(f"❌ SMS failed for: {quote_request.client_name}")
-                    else:
-                        current_app.logger.error(f"❌ Quote request not found with ID: {quote_request_id}")
-                except Exception as e:
-                    current_app.logger.error(f"💥 SMS sending error: {e}")
-            elif missing_info and (analysis['intent'] == 'get_quote' or 'quote' in user_message.lower()):
-                # Guide user to provide missing information
-                bot_response += f"\n\n{missing_info}"
-            else:
-                current_app.logger.info(f"❌ Quote not created - insufficient info or not confirmed")
-                current_app.logger.info(f"   - Has name: {bool(context_data.get('user_name'))}")
-                current_app.logger.info(f"   - Has email: {bool(context_data.get('user_email'))}")
-                current_app.logger.info(f"   - Has services: {analysis['services']}")
-                current_app.logger.info(f"   - Quote confirmed: {context_data.get('quote_confirmed', False)}")
+                    analysis = self._analyze_user_intent(user_message, context_data)
+                    quote_request_id = self._create_quote_request(conversation, context_data, analysis)
+
+                    if quote_request_id:
+                        current_app.logger.info(f"🚀 Creating quote for: {context_data.get('user_name')} - Services: {analysis['services']}")
+
+                        # Get created quote for notifications
+                        quote_request = self.db_models.quote_requests.get_by_id(quote_request_id)
+                        if quote_request:
+                            try:
+                                self._send_quote_notifications(quote_request, analysis)
+                            except Exception as notification_error:
+                                current_app.logger.error(f"Quote notification failed: {notification_error}")
+
+                        bot_response += f"\n\n✅ Perfect! I've created quote #{quote_request_id} for your project. Our team will review your requirements and contact you via WhatsApp within 2 hours with a detailed proposal."
+
+                except Exception as quote_error:
+                    current_app.logger.error(f"Quote creation failed: {quote_error}")
+                    bot_response += "\n\n⚠️ I encountered an issue creating your quote, but don't worry! Our team has been notified and will contact you directly."
 
             # Save bot response
-            bot_msg = ChatMessage(
+            self.db_models.chat_messages.create_message(
                 conversation_id=conversation_id,
                 sender='bot',
                 message=bot_response,
                 message_type='text',
                 message_metadata=json.dumps({
-                    'intent': analysis['intent'],
-                    'services': analysis['services'],
-                    'quote_created': quote_request_id is not None
-                })
+                    'intent': intent,
+                    'quote_request_id': quote_request_id
+                }) if quote_request_id else None
             )
-            db.session.add(bot_msg)
 
             # Update conversation context
-            conversation.context_data = json.dumps(context_data)
-            conversation.updated_at = datetime.utcnow()
-            if quote_request_id:
-                conversation.quote_request_id = quote_request_id
-
-            db.session.commit()
+            self.db_models.chat_conversations.update_one(
+                {'_id': conversation_id},
+                {'context_data': json.dumps(context_data)}
+            )
 
             return {
                 'success': True,
                 'bot_response': bot_response,
                 'conversation_id': conversation_id,
-                'intent': analysis['intent'],
-                'services': analysis['services'],
-                'quote_created': quote_request_id is not None
+                'quote_request_id': quote_request_id,
+                'intent': intent
             }
 
         except Exception as e:
-            db.session.rollback()
-            current_app.logger.error(f"Chatbot processing error: {e}")
+            current_app.logger.error(f"Chatbot error: {e}")
             return {
                 'success': False,
                 'error': str(e),
-                'bot_response': "I apologize, but I encountered an error. Please try again or contact us directly."
+                'bot_response': "I apologize, but I'm experiencing technical difficulties. Please try again or contact us directly."
             }
 
-    def _has_sufficient_quote_info(self, context_data: Dict, analysis: Dict) -> bool:
-        """Check if we have enough information to create a quote"""
-        required_fields = ['user_name', 'user_email']
-        has_required = all(context_data.get(field) for field in required_fields)
-        has_service = len(analysis['services']) > 0 or context_data.get('detected_services')
-
-        # Also check if user explicitly confirmed quote creation
-        user_confirmed = context_data.get('quote_confirmed', False)
-
-        return has_required and has_service and user_confirmed
-
-    def _get_missing_quote_info(self, context_data: Dict, analysis: Dict) -> str:
-        """Generate helpful prompt for missing information"""
-        missing_items = []
-
-        if not context_data.get('user_name'):
-            missing_items.append("**your name**")
-
-        if not context_data.get('user_email'):
-            missing_items.append("**your email address**")
-
-        has_service = len(analysis['services']) > 0 or context_data.get('detected_services')
-        if not has_service:
-            missing_items.append("**which service you need** (logo design, website, social media, etc.)")
-
-        user_confirmed = context_data.get('quote_confirmed', False)
-        if not user_confirmed and missing_items:
-            # If missing basic info, ask for it first
-            if len(missing_items) == 1:
-                return f"To create your quote, I just need {missing_items[0]}. Could you please provide that?"
-            elif len(missing_items) == 2:
-                return f"To create your quote, I need {missing_items[0]} and {missing_items[1]}. Could you please provide those details?"
-            else:
-                items_text = ", ".join(missing_items[:-1]) + f", and {missing_items[-1]}"
-                return f"To create your quote, I need {items_text}. Could you please provide those details?"
-        elif not user_confirmed and not missing_items:
-            # Has all info but needs confirmation
-            return "I have all the details for your quote. Should I go ahead and create it for you? Just say **'yes'** or **'create the quote'** to confirm!"
-
-        return ""
-
-    def extract_user_info_from_message(self, message: str) -> Dict:
-        """Extract user information from a message"""
-        import re
-
-        info = {}
+    def _update_context(self, message: str, context: Dict, intent: Dict) -> Dict:
+        """Update conversation context with extracted information"""
         message_lower = message.lower()
 
-        # Extract email addresses
-        email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-        emails = re.findall(email_pattern, message)
-        if emails:
-            info['email'] = emails[0]
-
-        # Extract names - various patterns
-        name_patterns = [
-            r'my name is\s+([A-Za-z\s]+)',
-            r'i am\s+([A-Za-z\s]+)',
-            r'i\'m\s+([A-Za-z\s]+)',
-            r'name:\s*([A-Za-z\s]+)',
-            r'call me\s+([A-Za-z\s]+)',
-        ]
-
-        for pattern in name_patterns:
-            match = re.search(pattern, message_lower)
-            if match:
-                name = match.group(1).strip().title()
-                # Remove common words that might be captured
-                name_words = name.split()
-                if len(name_words) <= 3 and all(word.isalpha() for word in name_words):
-                    info['name'] = name
+        # Extract name if not present
+        if not context.get('user_name'):
+            name_patterns = [
+                r"my name is (\w+)",
+                r"i'm (\w+)",
+                r"i am (\w+)",
+                r"call me (\w+)"
+            ]
+            for pattern in name_patterns:
+                match = re.search(pattern, message_lower)
+                if match:
+                    context['user_name'] = match.group(1).title()
                     break
 
-        # Also check if the entire message might be a name (when asked "What's your name?")
-        if not info.get('name') and len(message.split()) <= 3 and message.replace(' ', '').isalpha():
-            # Likely a name response
-            info['name'] = message.strip().title()
+        # Extract email
+        email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+        email_match = re.search(email_pattern, message)
+        if email_match:
+            context['user_email'] = email_match.group()
 
-        return info
+        # Extract phone
+        phone_patterns = [
+            r'(\+91[\s\-]?\d{10})',
+            r'(\d{10})',
+            r'(\d{3}[\s\-]?\d{3}[\s\-]?\d{4})'
+        ]
+        for pattern in phone_patterns:
+            match = re.search(pattern, message)
+            if match:
+                context['user_phone'] = match.group()
+                break
 
-    def _create_quote_request(self, conversation: ChatConversation, context_data: Dict, analysis: Dict) -> int:
-        """Create a quote request from conversation data"""
+        # Update services
+        if intent['services']:
+            if 'services_interested' not in context:
+                context['services_interested'] = []
+            for service in intent['services']:
+                if service not in context['services_interested']:
+                    context['services_interested'].append(service)
+
+        # Store project description
+        if len(message.split()) > 10:  # Longer messages might be descriptions
+            context['project_description'] = message
+
+        return context
+
+    def _should_create_quote(self, message: str, context: Dict, intent: Dict) -> bool:
+        """Determine if a quote should be created"""
+        # Must have minimum required info
+        has_name = bool(context.get('user_name'))
+        has_email = bool(context.get('user_email'))
+        has_service = bool(context.get('services_interested'))
+
+        # User explicitly requests quote
+        quote_confirmations = ['yes', 'create quote', 'generate quote', 'proceed', 'go ahead']
+        wants_quote = any(phrase in message.lower() for phrase in quote_confirmations)
+
+        return has_name and has_email and has_service and (wants_quote or intent['wants_quote'])
+
+    def _analyze_user_intent(self, message: str, context: Dict) -> Dict:
+        """Analyze user intent for quote creation"""
+        return {
+            'user_name': context.get('user_name', 'Unknown'),
+            'user_email': context.get('user_email', ''),
+            'services': context.get('services_interested', []),
+            'description': context.get('project_description', message),
+            'priority': 7 if context.get('user_email') else 5
+        }
+
+    def _create_quote_request(self, conversation: dict, context_data: Dict, analysis: Dict) -> str:
+        """Create a quote request in the database"""
         try:
-            # Determine primary service
-            services = analysis.get('services', []) or context_data.get('detected_services', [])
-            primary_service = services[0] if services else 'General Design'
-
             # Create quote request
-            quote_request = QuoteRequest(
-                client_name=context_data.get('user_name', 'Chatbot User'),
-                email=context_data.get('user_email', ''),
+            quote_request_id = self.db_models.quote_requests.create_quote_request(
+                client_name=analysis.get('user_name', 'Unknown'),
+                email=analysis.get('user_email', ''),
                 phone=context_data.get('user_phone', ''),
-                company_name=context_data.get('user_company', ''),
-                services_requested=', '.join(services) if services else primary_service,
-                project_description=self._generate_project_description(context_data, analysis),
-                budget_range=analysis.get('budget') or context_data.get('budget_range', 'To be discussed'),
-                timeline=context_data.get('timeline', 'Standard'),
-                additional_requirements=context_data.get('additional_requirements', ''),
+                company_name=context_data.get('company_name', ''),
+                services_requested=', '.join(analysis.get('services', [])),
+                project_description=analysis.get('description', ''),
+                budget_range=context_data.get('budget_range', ''),
+                timeline=context_data.get('timeline', ''),
+                additional_requirements=f"Created via AI chatbot. Priority: {analysis.get('priority', 5)}/10",
                 status='pending'
             )
 
-            db.session.add(quote_request)
-            db.session.flush()  # Get the ID
+            # Update conversation with quote request ID
+            self.db_models.chat_conversations.update_one(
+                {'_id': conversation['id']},
+                {'quote_request_id': quote_request_id}
+            )
 
-            # Trigger SMS/WhatsApp notification in background
-            self._send_quote_notifications(quote_request, analysis)
-
-            return quote_request.id
+            return quote_request_id
 
         except Exception as e:
-            current_app.logger.error(f"Quote creation error: {e}")
+            current_app.logger.error(f"Failed to create quote request: {e}")
             raise
 
-    def _send_quote_notifications(self, quote_request: QuoteRequest, analysis: Dict):
-        """Send SMS/WhatsApp notifications for new quote request"""
+    def _send_quote_notifications(self, quote_request: Dict, analysis: Dict):
+        """Send notifications for new quote request"""
         try:
-            # Prepare quote data for existing notification system
-            quote_data = {
-                'client_name': quote_request.client_name,
-                'email': quote_request.email,
-                'phone': quote_request.phone,
-                'company_name': quote_request.company_name,
-                'services_requested': quote_request.services_requested,
-                'project_description': quote_request.project_description,
-                'budget_range': quote_request.budget_range,
-                'timeline': quote_request.timeline,
-                'additional_requirements': quote_request.additional_requirements
-            }
-
-            # Import notification functions from app
-            from app import analyze_quote_with_ai, send_sms_notification, generate_ai_enhanced_whatsapp_message
-            import webbrowser
-            import urllib.parse
             import os
-            import asyncio
+            import urllib.parse
+            import webbrowser
             from threading import Thread
 
-            def send_notifications():
+            def send_notification():
                 try:
-                    # Run AI analysis
-                    loop = asyncio.new_event_loop()
-                    asyncio.set_event_loop(loop)
+                    # Generate WhatsApp message
+                    message = f"""🤖 NEW AI CHATBOT QUOTE - OrbitX
 
-                    try:
-                        ai_analysis = analyze_quote_with_ai(quote_data)
+👤 Client: {quote_request.get('client_name')}
+📧 Email: {quote_request.get('email')}
+📱 Phone: {quote_request.get('phone') or 'Not provided'}
 
-                        # Add chatbot-specific context
-                        ai_analysis['source'] = 'AI Chatbot'
-                        ai_analysis['conversation_id'] = getattr(quote_request, 'id', 'Unknown')
+🛠️ Services: {quote_request.get('services_requested')}
+📝 Description: {quote_request.get('project_description')}
 
-                        # Send SMS notification
-                        sms_sent = send_sms_notification(quote_data, ai_analysis)
+🤖 AI Priority: {analysis.get('priority', 5)}/10
+💡 Created via: AI Chatbot
 
-                        if sms_sent:
-                            print(f"[SUCCESS] SMS sent for chatbot quote: {quote_request.client_name} - Priority: {ai_analysis['priority']}/10")
-                        else:
-                            # Fallback to WhatsApp if SMS fails
-                            ai_message = loop.run_until_complete(generate_ai_enhanced_whatsapp_message(quote_data, ai_analysis))
-                            ai_message += f"\n\n[AI Chatbot] Source: AI Chatbot Conversation"
+⚡ Action: Send detailed quote to {quote_request.get('email')}"""
 
-                            encoded_message = urllib.parse.quote(ai_message)
-                            whatsapp_url = f"https://wa.me/{os.getenv('TARGET_WHATSAPP_NUMBER', '919518536672')}?text={encoded_message}"
+                    # URL encode for WhatsApp
+                    encoded_message = urllib.parse.quote(message)
+                    whatsapp_url = f"https://wa.me/{os.getenv('TARGET_WHATSAPP_NUMBER', '919518536672')}?text={encoded_message}"
+
+                    # Open WhatsApp (in development)
+                    if os.getenv('FLASK_ENV') != 'production':
+                        try:
                             webbrowser.open(whatsapp_url)
+                        except:
+                            pass  # Fail silently if can't open browser
 
-                            print(f"[WHATSAPP] Fallback used for chatbot quote: {quote_request.client_name}")
-
-                    finally:
-                        loop.close()
+                    current_app.logger.info(f"📱 WhatsApp notification sent for quote {quote_request.get('id')}")
 
                 except Exception as e:
-                    print(f"[ERROR] Quote notification error: {e}")
+                    current_app.logger.error(f"Notification sending failed: {e}")
 
-            # Run in background thread
-            Thread(target=send_notifications, daemon=True).start()
-            print(f"[BACKGROUND] SMS notification started for: {quote_request.client_name}")
-
-        except Exception as e:
-            current_app.logger.error(f"Failed to setup quote notifications: {e}")
-
-    def _send_sms_directly(self, quote_request: QuoteRequest, analysis: Dict):
-        """Send SMS notification directly without background thread"""
-        try:
-            # Prepare quote data for existing notification system
-            quote_data = {
-                'client_name': quote_request.client_name,
-                'email': quote_request.email,
-                'phone': quote_request.phone,
-                'company_name': quote_request.company_name,
-                'services_requested': quote_request.services_requested,
-                'project_description': quote_request.project_description,
-                'budget_range': quote_request.budget_range,
-                'timeline': quote_request.timeline,
-                'additional_requirements': quote_request.additional_requirements
-            }
-
-            # Import notification functions from app
-            from app import analyze_quote_with_ai, send_sms_notification
-
-            # Run AI analysis
-            ai_analysis = analyze_quote_with_ai(quote_data)
-
-            # Add chatbot-specific context
-            ai_analysis['source'] = 'AI Chatbot'
-            ai_analysis['conversation_id'] = quote_request.id
-
-            # Send SMS notification
-            sms_sent = send_sms_notification(quote_data, ai_analysis)
-
-            if sms_sent:
-                current_app.logger.info(f"✅ SMS sent for chatbot quote: {quote_request.client_name} - Priority: {ai_analysis['priority']}/10")
-                return True
-            else:
-                current_app.logger.warning(f"❌ SMS failed for chatbot quote: {quote_request.client_name}")
-                return False
+            # Send in background thread
+            Thread(target=send_notification, daemon=True).start()
 
         except Exception as e:
-            current_app.logger.error(f"Direct SMS sending error: {e}")
-            return False
+            current_app.logger.error(f"Failed to setup notifications: {e}")
 
-    def _generate_project_description(self, context_data: Dict, analysis: Dict) -> str:
-        """Generate project description from conversation context"""
-        services = analysis.get('services', []) or context_data.get('detected_services', [])
+    def _prepare_messages_for_ai(self, recent_messages: List[Dict], context_data: Dict) -> List[Dict]:
+        """Prepare messages for OpenAI API"""
+        messages = [{"role": "system", "content": self.system_prompt}]
 
-        description_parts = [
-            f"Project initiated through AI chatbot conversation.",
-            f"Services requested: {', '.join(services) if services else 'General design services'}."
-        ]
+        # Add context information
+        if context_data:
+            context_summary = f"User context: {json.dumps(context_data, indent=2)}"
+            messages.append({"role": "system", "content": context_summary})
 
-        if context_data.get('user_company'):
-            description_parts.append(f"Company: {context_data['user_company']}")
+        # Add recent conversation history
+        for msg in recent_messages[-6:]:  # Last 6 messages for context
+            role = "user" if msg.get('sender') == 'user' else "assistant"
+            messages.append({
+                "role": role,
+                "content": msg.get('message', '')
+            })
 
-        if analysis.get('budget'):
-            description_parts.append(f"Budget mentioned: ₹{analysis['budget']}")
-
-        # Add recent messages as context
-        if 'recent_messages' in context_data:
-            user_messages = [
-                msg['message'] for msg in context_data['recent_messages'][-5:]
-                if msg['sender'] == 'user'
-            ]
-            if user_messages:
-                description_parts.append(f"User requirements: {' | '.join(user_messages)}")
-
-        return ' '.join(description_parts)
+        return messages
 
     def get_conversation_history(self, conversation_id: str) -> List[Dict]:
-        """Get conversation message history"""
-        messages = db.session.query(ChatMessage).filter_by(
-            conversation_id=conversation_id
-        ).order_by(ChatMessage.created_at.asc()).all()
-
-        return [
-            {
-                'id': msg.id,
-                'sender': msg.sender,
-                'message': msg.message,
-                'type': msg.message_type,
-                'timestamp': msg.created_at.isoformat(),
-                'metadata': json.loads(msg.message_metadata or '{}')
-            }
-            for msg in messages
-        ]
+        """Get conversation history"""
+        try:
+            messages = self.db_models.chat_messages.get_by_conversation(conversation_id)
+            return [
+                {
+                    'id': msg.get('id'),
+                    'sender': msg.get('sender'),
+                    'message': msg.get('message'),
+                    'created_at': msg.get('created_at').isoformat() if msg.get('created_at') else None,
+                    'message_type': msg.get('message_type', 'text')
+                }
+                for msg in messages
+            ]
+        except Exception as e:
+            current_app.logger.error(f"Failed to get conversation history: {e}")
+            return []
 
 # Initialize chatbot instance
 def get_chatbot():
-    """Get chatbot instance with OpenAI client"""
-    from app import openai_client
+    """Get chatbot instance with OpenAI client and db_models"""
+    from app import openai_client, db_models
     if not openai_client:
         raise Exception("OpenAI client not configured")
-    return OrbitXChatbot(openai_client)
+    return OrbitXChatbot(openai_client, db_models)
